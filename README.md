@@ -18,6 +18,8 @@
 [![MCP Toplist](https://mcptoplist.com/badge/io.github.alisaitteke%2Fphotoshop-mcp.svg)](https://mcptoplist.com/server/io.github.alisaitteke%2Fphotoshop-mcp)
 [![Website](https://img.shields.io/badge/website-photoshop--mcp-cyan.svg)](https://photoshop-mcp.com/)
 
+[![Photoshop MCP Server MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp/badges/card.svg)](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp)
+
 **Chat with Photoshop like a colleague.** Describe what you want in plain words —
 "remove this background", "resize these for Instagram" — and your AI assistant
 does the clicking for you. Works with Cursor, Claude, or the built-in chat

@@ -19,6 +19,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightgrey.svg)]()
 
+[![Photoshop MCP Server MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp/badges/card.svg)](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp)
+
 Model Context Protocol (MCP) sunucusu; Claude ve Cursor gibi yapay zeka asistanlarının Adobe Photoshop'u programatik olarak kontrol etmesini sağlar. Bu sayede IDE'nizden doğal dil komutlarıyla tasarım oluşturabilir, görselleri düzenleyebilir ve Photoshop iş akışlarını otomatikleştirebilirsiniz. Ayrıca hem API anahtarlarını hem de CLI abonelik hesaplarını (Claude Code / Gemini CLI) destekleyen dahili **bağımsız web UI** üzerinden de çalışabilirsiniz. UI, isteğe bağlı **Action Plan (beta)** modunu da sunar: tüm Photoshop adımları tek bir LLM çağrısında planlanır, ardından tek seferde yürütülür.
 
 ## Neden bu proje var

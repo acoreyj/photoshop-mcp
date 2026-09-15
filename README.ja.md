@@ -19,6 +19,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightgrey.svg)]()
 
+[![Photoshop MCP Server MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp/badges/card.svg)](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp)
+
 モデルコンテキストプロトコル（MCP）サーバーで、ClaudeやCursorなどのAIアシスタントがAdobe Photoshopをプログラム的に操作できます。IDEから自然言語でデザイン作成・画像編集・ワークフロー自動化が可能です。同梱の**スタンドアロンWebUI**ではAPIキーとCLIサブスクリプションアカウント（Claude Code / Gemini CLI）の両方に対応しています。UIにはオプトインの**Action Plan（ベータ）**モードもあり、すべてのPhotoshopステップを1回のLLM呼び出しで計画し、一括実行できます。
 
 ## このプロジェクトが存在する理由

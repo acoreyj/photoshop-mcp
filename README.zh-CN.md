@@ -19,6 +19,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightgrey.svg)]()
 
+[![Photoshop MCP Server MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp/badges/card.svg)](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp)
+
 一个模型上下文协议（MCP）服务器，使 Claude 和 Cursor 等 AI 助手能够以编程方式控制 Adobe Photoshop。通过这个工具，您可以在 IDE 中使用自然语言命令创建设计、处理图像并自动化 Photoshop 工作流——或者通过捆绑的**独立 Web UI** 进行操作，后者同时支持 API 密钥和 CLI 订阅账户（Claude Code / Gemini CLI）。该 UI 还提供可选的 **Action Plan（测试版）** 模式，可在一次 LLM 调用中规划所有 Photoshop 步骤，然后一次性执行。
 
 ## 为何创建此项目

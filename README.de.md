@@ -19,6 +19,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Plattform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS-lightgrey.svg)]()
 
+[![Photoshop MCP Server MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp/badges/card.svg)](https://glama.ai/mcp/servers/alisaitteke/photoshop-mcp)
+
 Ein Model Context Protocol (MCP)-Server, der KI-Assistenten wie Claude und Cursor ermöglicht, Adobe Photoshop programmatisch zu steuern. Damit lassen sich Designs erstellen, Bilder bearbeiten und Photoshop-Workflows mit natürlicher Sprache automatisieren – direkt aus der IDE heraus oder über die mitgelieferte **eigenständige Web-UI**, die sowohl API-Schlüssel als auch CLI-Abonnementkonten (Claude Code / Gemini CLI) unterstützt. Die UI bietet außerdem einen opt-in **Action Plan (Beta)**-Modus, der alle Photoshop-Schritte in einem einzigen LLM-Aufruf plant und dann in einem einzigen Durchgang ausführt.
 
 ## Warum dieses Projekt existiert
