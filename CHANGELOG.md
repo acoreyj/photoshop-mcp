@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.7.12] - 2026-09-15
+
+[v1.7.11...v1.7.12](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.11...v1.7.12)
+
+### Fixes
+
+- Sync `server.json`, `package.json`, and agent docs to the actual tool count (116 = 100 atomic + 16 recipes) so release CI passes `verify:tool-counts`.
+
 ## [1.7.11] - 2026-09-15
 
 [v1.7.10...v1.7.11](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.10...v1.7.11)
