@@ -93,7 +93,7 @@ and refreshes release notes once npm is live.
    after a manual `npm publish` + `./mcp-publisher publish`.
 
 Always tag the **release commit on `master`**, not a feature branch. Re-pushing an
-existing tag is safe — the workflow skips creation when a release already exists.
+existing tag is safe — the workflow updates the GitHub Release for that tag.
 
 To backfill releases for tags that predate this workflow, run once:
 

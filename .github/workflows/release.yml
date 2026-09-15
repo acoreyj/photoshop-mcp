@@ -45,7 +45,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           body: ${{ steps.notes.outputs.body }}
-          skip_if_release_exists: true
           # photoshop-mcp.mcpb is the stable filename the site's one-click
           # Claude Desktop button points at (releases/latest/download/...).
           files: |
