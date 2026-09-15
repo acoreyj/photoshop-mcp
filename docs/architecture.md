@@ -114,7 +114,7 @@ Shipped in the same npm package (`photoshop-mcp-ui` bin). Stack:
 ### Agent modes
 
 1. **Default (ReAct)** — model calls tools iteratively; `src/ui/agent/api-key.ts` and provider-specific CLI paths.
-2. **Action Plan (beta)** — one planning LLM call produces an ordered tool list; direct execution with bounded repair (`src/ui/agent/action-plan.ts`). Fewer round-trips for multi-step prompts.
+2. **Action Plan (beta)** — one planning LLM call produces an ordered tool list; direct execution with bounded repair (`src/ui/agent/action-plan.ts`). API key uses structured `Output.object`; CLI account submits the plan via a one-tool sidecar MCP (`submit_action_plan`). Fewer round-trips for multi-step prompts.
 
 The UI restricts the agent to **Photoshop MCP tools only** — no shell, filesystem, or web tools from the host.
 

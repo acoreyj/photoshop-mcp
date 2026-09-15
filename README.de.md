@@ -64,8 +64,8 @@ Die Authentifizierungsmethode kann pro Anbieter in den Einstellungen gewechselt 
 
 ### Action Plan (Beta)
 
-Ein optionaler Ausführungsmodus in der eigenständigen Web-UI **nur für API-Schlüssel-Authentifizierung**
-(`cli_account` verwendet immer den Standard-Agenten-Fluss). Aktivieren über den
+Ein optionaler Ausführungsmodus in der eigenständigen Web-UI. Funktioniert mit **API-Schlüssel**
+und **CLI-Konto** (`cli_account`). Aktivieren über den
 **Action Plan**-Schalter neben der Modellauswahl im composer.
 
 Statt einer schrittweisen ReAct-Schleife (Modell → Werkzeug → Modell → Werkzeug …) führt Action Plan Folgendes durch:
@@ -78,7 +78,7 @@ Statt einer schrittweisen ReAct-Schleife (Modell → Werkzeug → Modell → Wer
    (plant nur die verbleibenden Schritte neu, bis zu 3 Mal).
 
 Der Plan erscheint als Live-Aufgabenliste über den Tool-Aufruf-Karten mit schrittweisem
-Status (`pending` → `running` → `done` / `error`). Pläne werden im Chatverlauf gespeichert und überleben Seitenneuladungen. Der Schalter ist standardmäßig deaktiviert; der bestehende
+Status (`pending` → `running` → `done` / `error`). Pläne werden im Chatverlauf gespeichert und überleben Seitenneuladungen. Der Schalter ist standardmäßig aktiviert; der bestehende
 Agenten-Fluss bleibt unverändert, wenn Action Plan deaktiviert ist.
 
 Geeignet für mehrstufige Prompts wie *„Hintergrund entfernen und für Web exportieren"*,
@@ -564,7 +564,7 @@ Am Ende alle Pfade in einer Tabelle auflisten.
 ## Funktionen
 
 - **Eigenständige Web-UI** — lokale Chat-Oberfläche (`photoshop-mcp-ui`); API-Schlüssel oder CLI-Abonnement-Authentifizierung pro Anbieter (Anthropic, Google)
-- **Action Plan (Beta)** — opt-in Plan-dann-Ausführen-Modus in der Web-UI (nur API-Schlüssel): ein Planungsaufruf, direkte Werkzeugausführung, begrenzte Reparatur bei Fehler
+- **Action Plan (Beta)** — opt-in Plan-dann-Ausführen-Modus in der Web-UI (API-Schlüssel oder CLI-Konto): ein Planungsaufruf, direkte Werkzeugausführung, begrenzte Reparatur bei Fehler
 - **Funktioniert auf Windows und macOS**
 - **Unterstützt Photoshop 2012–2025+**
 - **ExtendScript-API**: Universelle Kompatibilität über AppleScript/COM-Automatisierung

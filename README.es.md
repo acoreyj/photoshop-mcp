@@ -61,7 +61,7 @@ Es posible cambiar el método de autenticación por proveedor en Configuración 
 
 ### Action Plan (beta)
 
-Un modo de ejecución opcional en la UI web independiente solo para **autenticación con clave de API** (`cli_account` siempre usa el flujo agéntico predeterminado). Actívelo con el interruptor **Action Plan** junto al selector de modelos en el composer.
+Un modo de ejecución opcional en la UI web independiente. Funciona con **clave de API** y **cuenta CLI** (`cli_account`). Actívelo con el interruptor **Action Plan** junto al selector de modelos en el composer.
 
 En lugar de un bucle ReAct por paso (modelo → herramienta → modelo → herramienta …), Action Plan:
 
@@ -69,7 +69,7 @@ En lugar de un bucle ReAct por paso (modelo → herramienta → modelo → herra
 2. Ejecuta esas herramientas **directamente** en secuencia — sin intercambios de modelos adicionales entre pasos.
 3. Si un paso falla o hay una dependencia no resuelta, ejecuta un bucle de **reparación** acotado (replanifica solo los pasos restantes, hasta 3 veces).
 
-El plan aparece como una lista de tareas en tiempo real sobre las tarjetas de llamadas a herramientas, con estado por paso (`pending` → `running` → `done` / `error`). Los planes se persisten en el historial de chat para que sobrevivan a la recarga. El interruptor está desactivado de forma predeterminada; el flujo agéntico existente no cambia cuando Action Plan está desactivado.
+El plan aparece como una lista de tareas en tiempo real sobre las tarjetas de llamadas a herramientas, con estado por paso (`pending` → `running` → `done` / `error`). Los planes se persisten en el historial de chat para que sobrevivan a la recarga. El interruptor está activado de forma predeterminada; el flujo agéntico existente no cambia cuando Action Plan está desactivado.
 
 Ideal para prompts de varios pasos como *"eliminar el fondo y exportar para web"*, donde se desean menos llamadas al modelo y una ejecución de principio a fin más rápida.
 
@@ -519,7 +519,7 @@ Al terminar, lista todas las rutas en una tabla.
 ## Características
 
 - **UI web independiente** — interfaz de chat local (`photoshop-mcp-ui`); autenticación con clave de API o suscripción CLI por proveedor (Anthropic, Google)
-- **Action Plan (beta)** — modo opt-in de planificar-y-ejecutar en la UI web (solo clave de API): una llamada de planificación, ejecución directa de herramientas, reparación acotada en caso de fallo
+- **Action Plan (beta)** — modo opt-in de planificar-y-ejecutar en la UI web (clave de API o cuenta CLI): una llamada de planificación, ejecución directa de herramientas, reparación acotada en caso de fallo
 - **Compatible con Windows y macOS**
 - **Admite Photoshop 2012-2025+**
 - **API ExtendScript**: Compatibilidad universal mediante automatización AppleScript/COM

@@ -82,7 +82,8 @@ reuse your existing **Claude Code** / **Gemini CLI** account, no key needed.
 
 ![Standalone UI Screenshot](./images/frame_generic_light.png)
 
-Details, providers, and security notes: [`docs/standalone-ui.md`](docs/standalone-ui.md).
+Details, providers, Action Plan (API key or CLI account), and security notes:
+[`docs/standalone-ui.md`](docs/standalone-ui.md).
 
 ### Option 2 — Inside your AI app (Cursor, Claude, VS Code)
 

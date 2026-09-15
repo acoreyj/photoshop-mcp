@@ -26,9 +26,8 @@ export interface UIConfig {
   activeProvider: ProviderId;
   activeModel: string;
   /**
-   * Beta: when enabled (and the active provider uses api_key auth), a single
-   * planning LLM call produces an ordered tool plan that is executed directly,
-   * instead of the per-step ReAct loop. Defaults to off (backward compatible).
+   * When enabled, a single planning LLM call produces an ordered tool plan that
+   * is executed directly, instead of the per-step ReAct loop. Defaults to on.
    */
   actionPlanBeta?: boolean;
   customProvider: CustomProviderConfig | null;
@@ -39,8 +38,8 @@ const KV_KEY = 'config';
 const DEFAULT_CONFIG: UIConfig = {
   providers: {},
   activeProvider: 'anthropic',
-  activeModel: 'claude-sonnet-4-5',
-  actionPlanBeta: false,
+  activeModel: 'claude-sonnet-5',
+  actionPlanBeta: true,
   customProvider: null,
 };
 

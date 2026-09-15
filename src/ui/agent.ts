@@ -68,10 +68,7 @@ export async function* runChat(opts: RunChatOptions): AsyncGenerator<RunChatStre
   const authMethod = opts.authMethod ?? 'api_key';
   const actionPlanBeta = loadConfig().actionPlanBeta;
 
-  // Plan-and-execute needs generateObject (API key). Direct MCP execution does not
-  // need the subscription SDK, so honor the beta toggle whenever a key exists —
-  // even if the provider's active auth method is cli_account.
-  if (actionPlanBeta && opts.apiKey) {
+  if (actionPlanBeta) {
     yield* runChatViaActionPlan({
       prompt: opts.prompt,
       history: opts.history,
@@ -79,6 +76,7 @@ export async function* runChat(opts: RunChatOptions): AsyncGenerator<RunChatStre
       apiKey: opts.apiKey,
       modelId: opts.modelId,
       chatId: opts.chatId,
+      cliPath: opts.cliPath,
       authMethod,
       systemPrompt: ACTION_PLAN_SYSTEM_PROMPT,
       abortSignal: opts.abortSignal,

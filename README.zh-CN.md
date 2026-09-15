@@ -61,7 +61,7 @@ npx -p @alisaitteke/photoshop-mcp photoshop-mcp-ui
 
 ### Action Plan（测试版）
 
-独立 Web UI 中的可选执行模式，**仅适用于 API 密钥认证**（`cli_account` 始终使用默认的代理流程）。在 composer 中的模型选择器旁边，通过 **Action Plan** 开关开启。
+独立 Web UI 中的可选执行模式，同时支持 **API 密钥** 和 **CLI 账户**（`cli_account`）。在 composer 中的模型选择器旁边，通过 **Action Plan** 开关开启。
 
 与逐步 ReAct 循环（模型 → 工具 → 模型 → 工具……）不同，Action Plan：
 
@@ -69,7 +69,7 @@ npx -p @alisaitteke/photoshop-mcp photoshop-mcp-ui
 2. **直接**按顺序执行这些工具——步骤之间无额外的模型往返。
 3. 若某步骤失败或存在未解决的依赖项，运行有界**修复**循环（仅重新规划剩余步骤，最多 3 次）。
 
-计划以实时待办清单的形式显示在工具调用卡片上方，附带每步状态（`pending` → `running` → `done` / `error`）。计划会持久化到聊天历史中，重载后不会丢失。开关默认关闭；禁用 Action Plan 时，现有的代理流程不受影响。
+计划以实时待办清单的形式显示在工具调用卡片上方，附带每步状态（`pending` → `running` → `done` / `error`）。计划会持久化到聊天历史中，重载后不会丢失。开关默认开启；禁用 Action Plan 时，现有的代理流程不受影响。
 
 适合多步骤提示词，例如*"移除背景并导出为 Web 格式"*——可减少模型调用次数，加快端到端执行速度。
 
@@ -516,7 +516,7 @@ alert('Processing started!');
 ## 功能特性
 
 - **独立 Web UI** — 本地聊天界面（`photoshop-mcp-ui`）；每个提供商支持 API 密钥或 CLI 订阅认证（Anthropic、Google）
-- **Action Plan（测试版）** — Web UI 中可选的先规划后执行模式（仅 API 密钥）：一次规划调用、直接工具执行、失败时有界修复
+- **Action Plan（测试版）** — Web UI 中可选的先规划后执行模式（API 密钥或 CLI 账户）：一次规划调用、直接工具执行、失败时有界修复
 - **同时支持 Windows 和 macOS**
 - **支持 Photoshop 2012-2025+**
 - **ExtendScript API**：通过 AppleScript/COM 自动化实现通用兼容性

@@ -40,9 +40,9 @@ credential (e.g. keep an API key while trying CLI account, then switch back).
 
 ## Action Plan (beta)
 
-An optional execution mode in the standalone web UI for **API key auth only**
-(`cli_account` always uses the default agentic flow). Turn it on with the
-**Action Plan** toggle next to the model selector in the composer.
+An optional execution mode in the standalone web UI. Works with **API key** and
+**CLI account** (`cli_account`) auth. Turn it on with the **Action Plan** toggle
+next to the model selector in the composer.
 
 Instead of a per-step ReAct loop (model → tool → model → tool …), Action Plan:
 
@@ -55,8 +55,8 @@ Instead of a per-step ReAct loop (model → tool → model → tool …), Action
 
 The plan appears as a live todo list above the tool-call cards, with per-step
 status (`pending` → `running` → `done` / `error`). Plans are persisted in chat
-history so they survive reload. The toggle is off by default; the existing
-agentic flow is unchanged when Action Plan is disabled.
+history so they survive reload. The toggle is on by default; the existing
+agentic flow is used when Action Plan is disabled.
 
 Good for multi-step prompts such as *"remove the background and export for web"*
 where you want fewer model calls and faster end-to-end execution.

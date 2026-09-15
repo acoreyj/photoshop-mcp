@@ -20,7 +20,6 @@ const props = defineProps<{
   store: ReturnType<typeof useChatStore>;
   settingsOpen: boolean;
   actionPlanBeta: boolean;
-  hasApiKey: boolean;
 }>();
 
 const emit = defineEmits<{ 
@@ -61,10 +60,6 @@ const activeProviderInfo = computed(() => {
 
 const subscriptionMode = computed(
   () => activeProviderInfo.value?.authMethod === 'cli_account'
-);
-
-const actionPlanAvailable = computed(
-  () => props.hasApiKey || !subscriptionMode.value
 );
 
 async function onProviderChange(providerId: ProviderId): Promise<void> {
@@ -134,14 +129,8 @@ async function onModelChange(modelId: string): Promise<void> {
                 <Button
                   variant="ghost"
                   size="sm"
-                  :disabled="props.store.sending.value || !actionPlanAvailable"
-                  :title="
-                    !actionPlanAvailable
-                      ? 'Action Plan needs an API key for the planning call. Add one in Settings.'
-                      : subscriptionMode
-                        ? 'Uses your stored API key to plan all steps in one call, then executes them directly.'
-                        : 'Beta: plan all Photoshop steps in one call, then execute them in a single pass.'
-                  "
+                  :disabled="props.store.sending.value"
+                  title="Beta: plan all Photoshop steps in one call, then execute them in a single pass."
                   class="h-7 gap-1.5 px-2 text-xs hover:bg-white/5"
                   :class="
                     planBeta

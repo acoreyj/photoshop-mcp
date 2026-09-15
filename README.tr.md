@@ -62,8 +62,8 @@ Diğer kimlik bilgisini kaybetmeden sağlayıcı başına Ayarlar'dan kimlik do�
 
 ### Action Plan (beta)
 
-Bağımsız web UI'da **yalnızca API anahtarı kimlik doğrulaması** için isteğe bağlı bir yürütme modu
-(`cli_account` her zaman varsayılan ajantik akışı kullanır). **composer**'daki model seçicinin yanındaki
+Bağımsız web UI'da isteğe bağlı bir yürütme modu; **API anahtarı** ve **CLI hesabı**
+(`cli_account`) ile çalışır. **composer**'daki model seçicinin yanındaki
 **Action Plan** düğmesiyle etkinleştirin.
 
 Adım başına ReAct döngüsü (model → araç → model → araç …) yerine Action Plan:
@@ -72,7 +72,7 @@ Adım başına ReAct döngüsü (model → araç → model → araç …) yerine
 2. Bu araçları **doğrudan** sırayla çalıştırır — adımlar arasında ekstra model gidiş-dönüşü olmadan.
 3. Başarısız bir adımda veya çözümlenmemiş bağımlılıkta, sınırlı bir **onarım** döngüsü çalışır (yalnızca kalan adımları yeniden planlar, en fazla 3 kez).
 
-Plan, araç çağrı kartlarının üzerinde adım başına durum gösteren canlı bir yapılacaklar listesi olarak görünür (`pending` → `running` → `done` / `error`). Planlar sohbet geçmişinde kalıcı olarak saklanır ve yeniden yüklemeyi atlatır. Düğme varsayılan olarak kapalıdır; Action Plan devre dışıyken mevcut ajantik akış değişmeden kalır.
+Plan, araç çağrı kartlarının üzerinde adım başına durum gösteren canlı bir yapılacaklar listesi olarak görünür (`pending` → `running` → `done` / `error`). Planlar sohbet geçmişinde kalıcı olarak saklanır ve yeniden yüklemeyi atlatır. Düğme varsayılan olarak açıktır; Action Plan devre dışıyken mevcut ajantik akış değişmeden kalır.
 
 *"arka planı kaldır ve web için dışa aktar"* gibi daha az model çağrısı ve daha hızlı uçtan uca yürütme istediğiniz çok adımlı istemler için idealdir.
 
@@ -554,7 +554,7 @@ Bitince tüm yolları bir tabloda listele.
 
 - **Bağımsız web UI** — yerel sohbet arayüzü (`photoshop-mcp-ui`); sağlayıcı başına API anahtarı
   veya CLI abonelik kimlik doğrulaması (Anthropic, Google)
-- **Action Plan (beta)** — web UI'da isteğe bağlı plan-sonra-uygula modu (yalnızca API anahtarı):
+- **Action Plan (beta)** — web UI'da isteğe bağlı plan-sonra-uygula modu (API anahtarı veya CLI hesabı):
   tek bir planlama çağrısı, doğrudan araç yürütme, başarısızlıkta sınırlı onarım
 - **Hem Windows hem macOS'ta çalışır**
 - **Photoshop 2012–2025+ destekler**
