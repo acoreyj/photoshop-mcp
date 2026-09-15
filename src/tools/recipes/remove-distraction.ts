@@ -6,7 +6,7 @@ import {
   parseGenerativeResult,
   runGenerativeSnippet,
 } from '../generative/_shared.js';
-import { clampInt, executeRecipe } from './_shared.js';
+import { clampInt, executeRecipe, toolFailure } from './_shared.js';
 
 const TOOL_NAME = 'photoshop_recipe_remove_distraction';
 
@@ -58,41 +58,52 @@ async function runRemoveDistraction(
     args.use_generative !== false && caps.features.generative_remove;
 
   if (useGenerative) {
-    const raw = await runGenerativeSnippet(
-      connection,
-      ExtendScriptSnippets.generativeRemove(feather, false)
-    );
-    const result = parseGenerativeResult(raw);
-    if (!result.isError) {
-      const text = result.content[0]?.type === 'text' ? result.content[0].text : '{}';
-      try {
-        const body = JSON.parse(text) as Record<string, unknown>;
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(
-                {
-                  ...body,
-                  undo_history_states_consumed: 1,
-                  details: {
-                    ...(typeof body.details === 'object' && body.details ? body.details : {}),
-                    fill_method: 'generative_remove',
-                    feather_px: feather,
+    try {
+      const raw = await runGenerativeSnippet(
+        connection,
+        ExtendScriptSnippets.generativeRemove(feather, false)
+      );
+      const result = parseGenerativeResult(raw);
+      if (!result.isError) {
+        const text = result.content[0]?.type === 'text' ? result.content[0].text : '{}';
+        try {
+          const body = JSON.parse(text) as Record<string, unknown>;
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    ...body,
+                    undo_history_states_consumed: 1,
+                    details: {
+                      ...(typeof body.details === 'object' && body.details ? body.details : {}),
+                      fill_method: 'generative_remove',
+                      feather_px: feather,
+                    },
                   },
-                },
-                null,
-                2
-              ),
-            },
-          ],
-        };
-      } catch {
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        } catch {
+          return result;
+        }
+      }
+      if (args.use_generative === true) {
         return result;
       }
-    }
-    if (args.use_generative === true) {
-      return result;
+    } catch (error) {
+      if (args.use_generative === true) {
+        return toolFailure({
+          ok: false,
+          code: 'generative_unavailable',
+          message: error instanceof Error ? error.message : String(error),
+          suggested_next_tool: 'photoshop_get_capabilities',
+        });
+      }
     }
   }
 

@@ -314,12 +314,21 @@ async function main(): Promise<void> {
           ok?: boolean;
           details?: {
             count?: number;
-            documents?: Array<{ id?: number; is_active?: boolean }>;
+            documents?: Array<{
+              id?: number;
+              is_active?: boolean;
+              width?: number;
+              height?: number;
+            }>;
           };
         };
         const docs = payload.details?.documents ?? [];
-        const inactive = docs.find((d) => d.is_active !== true);
-        switchTargetId = inactive?.id;
+        // After 800x600 + 400x300 + open_image, the PNG is active. The first
+        // inactive tab is the original 800x600 — pick the 400x300 by size.
+        const target400 = docs.find(
+          (d) => d.is_active !== true && d.width === 400 && d.height === 300
+        );
+        switchTargetId = target400?.id;
         const ok = payload.ok === true && (payload.details?.count ?? 0) >= 2;
         t.recordPrompt(
           'assert:list_documents_multi',
@@ -779,9 +788,17 @@ async function main(): Promise<void> {
     code: `var doc=app.activeDocument; var target=null; function findRaster(c){for(var i=0;i<c.layers.length;i++){var L=c.layers[i]; if(L.typename==='LayerSet'){var n=findRaster(L); if(n)return n;} else if(String(L.kind)==='LayerKind.NORMAL'&&!L.isBackgroundLayer){return L;}} return null;} target=findRaster(doc); if(!target) throw new Error('No raster layer'); doc.activeLayer=target; return {active:target.name,kind:String(target.kind)};`,
   });
   await t.run('photoshop_select_rectangle', { left: 80, top: 80, right: 200, bottom: 200 });
-  await t.run('photoshop_recipe_remove_distraction', { feather_px: 1 });
+  const recipeAiSmoke = process.env.PHOTOSHOP_AI_SMOKE === '1';
+  await t.run('photoshop_recipe_remove_distraction', {
+    feather_px: 1,
+    ...(recipeAiSmoke ? {} : { use_generative: false }),
+  });
   await t.run('photoshop_undo', { steps: 1 });
-  await t.run('photoshop_recipe_sky_blend', { sky_image_path: testPng, horizon_pct: 45 });
+  await t.run('photoshop_recipe_sky_blend', {
+    sky_image_path: testPng,
+    horizon_pct: 45,
+    ...(recipeAiSmoke ? {} : { use_native_sky: false }),
+  });
   await t.run('photoshop_undo', { steps: 1 });
 
   const generativeSkip =
