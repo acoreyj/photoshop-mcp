@@ -128,12 +128,14 @@ syncs.
 2. On **Dockerfile** (`…/admin/dockerfile`), not Releases. Fill the generated
    build spec (Glama clones into `/app` and wraps CMD with `mcp-proxy --`):
    - Node **20**
-   - Build steps `["pnpm install", "pnpm run build"]`
+   - Build steps `["pnpm install --ignore-scripts", "pnpm run build"]`
+     (`--ignore-scripts` is required: Glama’s image has no `make`, so compiling
+     `better-sqlite3` fails the Docker build. MCP stdio does not need SQLite.)
    - CMD arguments `["node", "dist/index.js"]` — do **not** prepend `mcp-proxy`
    - Leave pinned SHA empty so HEAD is used
 3. **Deploy** → wait for the sandbox health check (`initialize` + `tools/list`).
-   Photoshop is not required. MCP stdio must boot even if Glama skips native
-   `better-sqlite3` scripts (analytics falls back off SQLite).
+   Photoshop is not required. Analytics falls back off SQLite when native
+   bindings are missing.
 4. **Make Release** with the semver matching the GitHub tag. Auto-Release stays
    blocked until this first release exists.
 
