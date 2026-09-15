@@ -5,74 +5,85 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.13] - 2026-09-15
+
+[v1.7.12...v1.7.13](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.12...v1.7.13)
+
+### Other
+
+- Skip native sqlite compile on Glama so the Docker sandbox can build without make. (`00ece07`)
+- Add the Glama quality-score card to the README locales. (`641ecaf`)
 
 ## [1.7.12] - 2026-09-15
 
 [v1.7.11...v1.7.12](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.11...v1.7.12)
 
-### Fixes
+### Version bumps
 
-- Sync `server.json`, `package.json`, and agent docs to the actual tool count (116 = 100 atomic + 16 recipes) so release CI passes `verify:tool-counts`.
+- 1.7.12 (`64e5e37`)
 
 ## [1.7.11] - 2026-09-15
 
 [v1.7.10...v1.7.11](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.10...v1.7.11)
 
-### Fixes
+### Version bumps
 
-- Boot the MCP stdio server when `better-sqlite3` native bindings are missing (pnpm 10 / Glama), instead of crashing analytics on startup.
-
-### Changed
-
-- Allow pnpm to run `better-sqlite3` and `esbuild` build scripts.
-- Document Glama Dockerfile first-release steps (CMD without `mcp-proxy`).
+- 1.7.11 (`c19736c`)
 
 ## [1.7.10] - 2026-09-15
 
 [v1.7.9...v1.7.10](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.9...v1.7.10)
 
-### Fixes
+### Version bumps
 
-- Trust `NPM_PUBLISHED` after npm publish and retry `npm view` in release notes so GitHub releases show **Published on npm** reliably.
-- Pass `GH_TOKEN` to the refresh-release-notes workflow dispatch.
+- 1.7.10 (`ee55064`)
 
 ## [1.7.9] - 2026-09-15
 
 [v1.7.8...v1.7.9](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.8...v1.7.9)
 
-### Fixes
+### Version bumps
 
-- Drop the removed `skip_if_release_exists` input from `action-gh-release@v3`.
+- 1.7.9 (`ffdb97a`)
 
 ## [1.7.8] - 2026-09-15
 
 [v1.7.7...v1.7.8](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.7...v1.7.8)
 
-### Changed
+### Version bumps
 
-- Run GitHub Actions on the Node 24 action runtime (`checkout@v5`, `setup-node@v5`, `action-gh-release@v3`).
+- 1.7.8 (`85e09f8`)
 
 ## [1.7.7] - 2026-09-15
 
 [v1.7.6...v1.7.7](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.6...v1.7.7)
 
-### Fixes
+### Other
 
-- Stop shipping a dangling `pageview.js` import that crashed `npx` installs with `MODULE_NOT_FOUND` ([#38](https://github.com/alisaitteke/photoshop-mcp/issues/38)).
-- Fall back from generative recipe paths when Photoshop rejects them (`remove-distraction`, `sky-blend`).
+- Let Action Plan run on CLI subscription accounts. (`2f3e654`)
+- Fall back from generative recipe paths when Photoshop rejects them. (`5c4c51a`)
+- Stop shipping a dangling pageview.js import that crashes npx installs. (`514b22d`)
+- Stop serving the marketing site from GitHub Pages. (`7b63596`)
 
-### Changed
+### Version bumps
 
-- Let Action Plan run on CLI subscription accounts (Claude and Gemini), and turn the mode on by default.
-- Stop serving the marketing site from GitHub Pages.
+- 1.7.7 (`71c57f4`)
 
-## [1.7.6] - 2026-09-09
+## [1.7.6] - 2026-09-12
 
 [v1.7.5...v1.7.6](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.5...v1.7.6)
 
-### Changed
+### Other
 
-- Update anonymous usage analytics for the MCP server, standalone UI, and marketing site ([#36](https://github.com/alisaitteke/photoshop-mcp/pull/36)).
+- Document PulseMCP and Chinese MCP directory listing workflows. (`1270b0b`)
+- Redesign marketing site with landing, recipes, and tool explorer. (`9a379b7`)
+- Keep the 1.7.6 changelog user-facing. (`31d0fdc`)
+- Replace PostHog with self-hosted Rybbit for MCP, UI, and site analytics. (`375a940`)
+- Add PostHog analytics to the marketing site (`442f1c0`)
+
+### Version bumps
+
+- 1.7.6 (`62dfcd5`)
 
 ## [1.7.5] - 2026-09-07
 
@@ -80,31 +91,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixes
 
-- Map `photoshop_set_layer_blend_mode` `COLOR` to ExtendScript `BlendMode.COLORBLEND`; Darker/Lighter Color fall back to Action Manager ([#29](https://github.com/alisaitteke/photoshop-mcp/issues/29)).
-- Fix `photoshop_apply_layer_style` drop shadow (and other styles) `putObject` class-id argument; Use Global Light is off so `angle` applies.
-- Treat `photoshop_place_image` `x`/`y` as absolute canvas top-left, not an offset from centered Place.
-- `photoshop_recipe_remove_background` falls back to Color Range on uniform/high-key studio backgrounds (`details.method`).
-- Optional `document_id` on mutating tools pins edits to a document from `get_state` / `list_documents`; `document.id` is included in context.
-- Drop shadow no longer sets a locale-specific "Linear" contour name; Color Range fallback writes both Lab min and max; `place_image` fails instead of silently skipping translate.
-- Wrap generative `prompt` values in ExtendScript string literals (`jsStringLiteral`); non-ASCII is `\uXXXX`-escaped so multi-word prompts no longer break JSX syntax ([#31](https://github.com/alisaitteke/photoshop-mcp/issues/31)).
-- Apply the detected Photoshop app name on macOS before the first ExtendScript run ([#32](https://github.com/alisaitteke/photoshop-mcp/pull/32)).
-
-### Docs
-
-- Simplify the README landing page, restore badges, and regenerate the hero image.
-- Improve site SEO and AI-search readiness; point the marketing site at photoshop-mcp.com; serve trailing-slash doc URLs on GitHub Pages; link the footer to alisait.com and LinkedIn.
+- fix(macos): apply detected app name before the first script runs (`09bfaf9`)
+- fix(release): validate tags and recover notes when tag points to wrong commit (`9f3190d`)
 
 ### Other
 
-- Validate release tags and recover notes when a tag points at the wrong commit.
-
-## [1.7.4] - 2026-08-29
-
-[v1.7.3...f8ada83](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.3...f8ada83)
-
-### Other
-
+- Link the site footer to alisait.com and LinkedIn (`ce310f9`)
+- Serve trailing-slash doc URLs on GitHub Pages (`bdcac5b`)
+- Point the marketing site at photoshop-mcp.com (`91d169e`)
+- Restore README badges, rename hero image to bust GitHub image cache (`d9396ae`)
+- Improve site SEO and AI-search readiness (`69d0ae9`)
+- Simplify README into a designer-friendly landing page, regenerate hero image (`f07d695`)
+- Fix #31: wrap generative prompts as ExtendScript string literals. (`4181d98`)
+- Harden #29 follow-ups: locale-safe drop shadow, Color Range min/max, fail on place translate. (`fbd3a3a`)
+- Fix issue #29: Color blend mapping, drop shadow descriptor, place_image coords, studio BG fallback, and optional document_id. (`4a742dc`)
 - Expand atomic tool surface to 118 tools and sync agent documentation. (`5a9d3cd`)
+
+### Version bumps
+
+- 1.7.5 (`df09a58`)
+- 1.7.4 (`3777ca7`)
+
+## [1.7.4] - 2026-08-25
+
+[v1.7.3...v1.7.4](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.3...v1.7.4)
+
+### Fixes
+
+- fix(macos): apply detected app name before the first script runs (`09bfaf9`)
+- fix(release): validate tags and recover notes when tag points to wrong commit (`9f3190d`)
+
+### Other
+
+- Link the site footer to alisait.com and LinkedIn (`ce310f9`)
+- Serve trailing-slash doc URLs on GitHub Pages (`bdcac5b`)
+- Point the marketing site at photoshop-mcp.com (`91d169e`)
+- Restore README badges, rename hero image to bust GitHub image cache (`d9396ae`)
+- Improve site SEO and AI-search readiness (`69d0ae9`)
+- Simplify README into a designer-friendly landing page, regenerate hero image (`f07d695`)
+- Fix #31: wrap generative prompts as ExtendScript string literals. (`4181d98`)
+- Harden #29 follow-ups: locale-safe drop shadow, Color Range min/max, fail on place translate. (`fbd3a3a`)
+- Fix issue #29: Color blend mapping, drop shadow descriptor, place_image coords, studio BG fallback, and optional document_id. (`4a742dc`)
+- Expand atomic tool surface to 118 tools and sync agent documentation. (`5a9d3cd`)
+
+### Version bumps
+
+- 1.7.4 (`3777ca7`)
 
 ## [1.7.3] - 2026-08-25
 
