@@ -7,16 +7,23 @@ const DATA_DIR = getPhotoshopMcpHomeDir();
 const DB_PATH = join(DATA_DIR, 'data.db');
 
 let instance: DatabaseType | null = null;
+let loadError: Error | null = null;
 
 export function getDB(): DatabaseType {
   if (instance) return instance;
-  mkdirSync(dirname(DB_PATH), { recursive: true, mode: 0o700 });
-  const db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  migrate(db);
-  instance = db;
-  return db;
+  if (loadError) throw loadError;
+  try {
+    mkdirSync(dirname(DB_PATH), { recursive: true, mode: 0o700 });
+    const db = new Database(DB_PATH);
+    db.pragma('journal_mode = WAL');
+    db.pragma('foreign_keys = ON');
+    migrate(db);
+    instance = db;
+    return db;
+  } catch (err) {
+    loadError = err instanceof Error ? err : new Error(String(err));
+    throw loadError;
+  }
 }
 
 export function closeDB(): void {
@@ -24,6 +31,7 @@ export function closeDB(): void {
     instance.close();
     instance = null;
   }
+  loadError = null;
 }
 
 function migrate(db: DatabaseType): void {

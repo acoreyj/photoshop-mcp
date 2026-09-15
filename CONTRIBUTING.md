@@ -125,13 +125,21 @@ After merging changes to `glama.json`, re-run the claim flow on Glama so metadat
 syncs.
 
 1. Open the server page → **Claim ownership** (GitHub OAuth).
-2. On the **admin** tab, configure the Docker/build spec (Node 20, `npm install`,
-   `node dist/index.js` via Glama's `mcp-proxy` wrapper).
+2. On **Dockerfile** (`…/admin/dockerfile`), not Releases. Fill the generated
+   build spec (Glama clones into `/app` and wraps CMD with `mcp-proxy --`):
+   - Node **20**
+   - Build steps `["pnpm install", "pnpm run build"]`
+   - CMD arguments `["node", "dist/index.js"]` — do **not** prepend `mcp-proxy`
+   - Leave pinned SHA empty so HEAD is used
 3. **Deploy** → wait for the sandbox health check (`initialize` + `tools/list`).
-4. **Make Release** with the semver matching the GitHub tag.
+   Photoshop is not required. MCP stdio must boot even if Glama skips native
+   `better-sqlite3` scripts (analytics falls back off SQLite).
+4. **Make Release** with the semver matching the GitHub tag. Auto-Release stays
+   blocked until this first release exists.
 
 Glama releases are independent of GitHub Releases — trigger a new Glama release when
-you want the directory grade/security scan refreshed for a shipped version.
+you want the directory grade/security scan refreshed for a shipped version. The
+public listing will still say the server cannot be deployed (it needs local Photoshop).
 
 ### Smithery (MCPB)
 

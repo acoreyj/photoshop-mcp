@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.7.11] - 2026-09-15
+
+[v1.7.10...v1.7.11](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.10...v1.7.11)
+
+### Fixes
+
+- Boot the MCP stdio server when `better-sqlite3` native bindings are missing (pnpm 10 / Glama), instead of crashing analytics on startup.
+
+### Changed
+
+- Allow pnpm to run `better-sqlite3` and `esbuild` build scripts.
+- Document Glama Dockerfile first-release steps (CMD without `mcp-proxy`).
+
 ## [1.7.10] - 2026-09-15
 
 [v1.7.9...v1.7.10](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.9...v1.7.10)
