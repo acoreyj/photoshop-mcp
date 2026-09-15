@@ -222,6 +222,7 @@ Tests are tiered by whether Photoshop must be running:
 npm run build:server
 npm run lint
 npm run verify:photoshop-prompts
+npm run verify:pack
 ```
 
 Run these before every PR.
@@ -243,6 +244,7 @@ Integration tests communicate with a live Photoshop instance over stdio — the 
 - [ ] `npm run lint` passes
 - [ ] `npm run build:server` passes
 - [ ] `npm run verify:photoshop-prompts` passes
+- [ ] `npm run verify:pack` passes
 - [ ] Integration tests run (if applicable — requires Photoshop)
 - [ ] Screenshots attached for UI changes
 

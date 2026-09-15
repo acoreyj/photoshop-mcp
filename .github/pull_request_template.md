@@ -17,6 +17,7 @@
 - [ ] `npm run build:server` passes
 - [ ] Tests run (check all that apply):
   - [ ] `npm run verify:photoshop-prompts`
+  - [ ] `npm run verify:pack`
   - [ ] `npm run test:mcp-local` (requires Photoshop)
   - [ ] `npm run test:mcp-all` (requires Photoshop)
 - [ ] UI change screenshots attached (if applicable)

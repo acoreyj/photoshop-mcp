@@ -41,6 +41,7 @@ npm run test:mcp-local    # prompt-layer smoke
 npm run test:mcp-all      # full sequential tool sweep
 npm run spike:photoshop-actions  # generative AI action probes → scripts/output/generative-probe-report.json
 npm run verify:photoshop-prompts
+npm run verify:pack       # packed tarball ESM imports resolve (issue #38)
 ```
 
 ### UXP bridge plugin (Neural Filters)

@@ -87,6 +87,9 @@ jobs:
       - name: Verify tool counts in docs
         run: npm run verify:tool-counts
 
+      - name: Verify packed ESM imports
+        run: npm run verify:pack
+
       - name: Sync server.json with package.json
         run: npm run sync:server-version
 

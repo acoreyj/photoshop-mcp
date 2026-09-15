@@ -12,11 +12,12 @@ import {
 } from './identity.js';
 import { onMcpClientConnected, onMcpClientDisconnected } from './mcp-client.js';
 import {
+  captureMcpPageleave,
+  captureMcpPageview,
   endMcpAnalyticsSession,
   recordMcpToolCall,
   startMcpAnalyticsSession,
 } from './mcp-session.js';
-import { captureMcpPageleave, captureMcpPageview } from './pageview.js';
 import { getAnalytics, resetAnalyticsProvider, shutdownAnalyticsClient } from './provider.js';
 import type {
   AnalyticsEvent,

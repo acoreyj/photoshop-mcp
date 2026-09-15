@@ -115,5 +115,5 @@ More: [docs/troubleshooting.md](docs/troubleshooting.md).
 ## Contributing (agents editing this repo)
 
 - Canonical language for code, comments, commits, and PRs: **English**.
-- Before PR: `npm run lint`, `npm run build:server`, `npm run verify:photoshop-prompts`.
+- Before PR: `npm run lint`, `npm run build:server`, `npm run verify:photoshop-prompts`, `npm run verify:pack`.
 - Do not add AI-attribution footers to commits or PR descriptions.
