@@ -5,6 +5,15 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.14] - 2026-09-15
+
+[v1.7.13...v1.7.14](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.13...v1.7.14)
+
+### Other
+
+- Drop the three-step how-it-works section and ignore the VitePress cache. (`fa4dbcf`)
+- Simplify the homepage demo card by dropping tool-call steps and export details. (`0eff6b4`)
+
 ## [1.7.13] - 2026-09-15
 
 [v1.7.12...v1.7.13](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.12...v1.7.13)
@@ -13,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Skip native sqlite compile on Glama so the Docker sandbox can build without make. (`00ece07`)
 - Add the Glama quality-score card to the README locales. (`641ecaf`)
+
+### Version bumps
+
+- 1.7.13 (`4646e8f`)
 
 ## [1.7.12] - 2026-09-15
 
