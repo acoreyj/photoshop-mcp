@@ -5,9 +5,19 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [1.7.10] - 2026-09-15
+
+[v1.7.9...v1.7.10](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.9...v1.7.10)
+
+### Fixes
+
+- Trust `NPM_PUBLISHED` after npm publish and retry `npm view` in release notes so GitHub releases show **Published on npm** reliably.
+- Pass `GH_TOKEN` to the refresh-release-notes workflow dispatch.
+
 ## [1.7.9] - 2026-09-15
 
-[v1.7.8...HEAD](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.8...HEAD)
+[v1.7.8...v1.7.9](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.8...v1.7.9)
 
 ### Fixes
 

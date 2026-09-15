@@ -153,14 +153,29 @@ new_contributors() {
 }
 
 # npm_status_note PKG VERSION → single-line status for release callout.
+# Set NPM_PUBLISHED=1 after a successful publish so we skip the registry race.
+# Otherwise retry npm view — metadata often lags the upload by a few seconds.
 npm_status_note() {
   local pkg="$1" version="$2"
-  if command -v npm >/dev/null 2>&1 \
-    && npm view "${pkg}@${version}" version 2>/dev/null | grep -qx "${version}"; then
-    echo "✅ Published on npm."
-  else
-    echo "⏳ Not on npm yet — \`npm publish\` usually follows shortly after this GitHub release."
+  case "${NPM_PUBLISHED:-}" in
+    1 | true | TRUE | True)
+      echo "✅ Published on npm."
+      return 0
+      ;;
+  esac
+
+  local attempt
+  if command -v npm >/dev/null 2>&1; then
+    for attempt in 1 2 3 4 5 6; do
+      if npm view "${pkg}@${version}" version 2>/dev/null | grep -qx "${version}"; then
+        echo "✅ Published on npm."
+        return 0
+      fi
+      [[ "$attempt" -lt 6 ]] && sleep 5
+    done
   fi
+
+  echo "⏳ Not on npm yet — \`npm publish\` usually follows shortly after this GitHub release."
 }
 
 # tag_date TAG → YYYY-MM-DD from tagger or commit date.

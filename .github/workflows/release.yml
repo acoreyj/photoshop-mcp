@@ -139,4 +139,5 @@ jobs:
       - name: Refresh release notes (npm published)
         env:
           GH_TOKEN: ${{ github.token }}
+          NPM_PUBLISHED: "1"
         run: bash scripts/refresh-release-notes.sh "${GITHUB_REF_NAME}"

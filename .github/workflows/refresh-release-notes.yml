@@ -29,4 +29,5 @@ jobs:
       - name: Refresh release notes
         env:
           TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: bash scripts/refresh-release-notes.sh "$TAG"
