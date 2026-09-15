@@ -47,23 +47,6 @@
     "title": "Zaten kullandığınız araçlarla çalışır",
     "more": "ve yerel MCP sunucusu çalıştıran her istemci"
   },
-  "how": {
-    "title": "Üç adım, kod yok",
-    "steps": [
-      {
-        "title": "Kurun",
-        "text": "İstemcinizde tek tık ya da tek komut. Sunucu kendi bilgisayarınızda çalışır."
-      },
-      {
-        "title": "Photoshop’u açın",
-        "text": "2012 ve sonrası her sürüm. Photoshop içine bir şey yüklemeniz gerekmez; sunucu doğrudan konuşur."
-      },
-      {
-        "title": "Yazın",
-        "text": "Gündelik dille isteyin. Asistan belgeyi okur, adımları uygular ve önizleme gösterir."
-      }
-    ]
-  },
   "recipes": {
     "title": "Neler isteyebilirsiniz",
     "lead": "On altı hazır iş akışı. Her biri tek geri alma adımı olarak çalışır; hiçbir iş yarım kalmaz.",

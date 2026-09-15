@@ -47,23 +47,6 @@
     "title": "Funktioniert mit den Werkzeugen, die du schon nutzt",
     "more": "und jedem Client, der lokale MCP-Server startet"
   },
-  "how": {
-    "title": "Drei Schritte, kein Code",
-    "steps": [
-      {
-        "title": "Installieren",
-        "text": "Ein Klick im Client oder ein Befehl. Der Server läuft auf deinem eigenen Rechner."
-      },
-      {
-        "title": "Photoshop öffnen",
-        "text": "Jede Version ab 2012. In Photoshop selbst ist nichts zu laden — der Server spricht direkt mit ihm."
-      },
-      {
-        "title": "Prompt schreiben",
-        "text": "Frag in normaler Sprache. Der Assistent liest das Dokument, führt die Schritte aus und zeigt eine Vorschau."
-      }
-    ]
-  },
   "recipes": {
     "title": "Was du verlangen kannst",
     "lead": "Sechzehn fertige Arbeitsabläufe. Jeder läuft als ein einziger Rückgängig-Schritt, damit nichts halbfertig zurückbleibt.",

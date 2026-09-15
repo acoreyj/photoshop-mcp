@@ -47,23 +47,6 @@
     "title": "Funciona con las herramientas que ya usas",
     "more": "y cualquier cliente que ejecute servidores MCP locales"
   },
-  "how": {
-    "title": "Tres pasos, sin código",
-    "steps": [
-      {
-        "title": "Instala",
-        "text": "Un clic en tu cliente, o un comando. El servidor se ejecuta en tu propia máquina."
-      },
-      {
-        "title": "Abre Photoshop",
-        "text": "Cualquier versión desde 2012. No hay que cargar nada dentro de Photoshop: el servidor habla con él directamente."
-      },
-      {
-        "title": "Escribe lo que quieres",
-        "text": "Pídelo en lenguaje normal. El asistente lee el documento, hace los pasos y te muestra una vista previa."
-      }
-    ]
-  },
   "recipes": {
     "title": "Lo que puedes pedir",
     "lead": "Dieciséis flujos listos para usar. Cada uno se ejecuta como un único paso de deshacer, así nada queda a medias.",

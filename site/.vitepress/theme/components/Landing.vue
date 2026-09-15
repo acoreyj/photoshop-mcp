@@ -54,23 +54,7 @@ const SAMPLE = `{
       </div>
     </section>
 
-    <!-- 3 · how it works -->
-    <section class="ps-section">
-      <div class="ps-container">
-        <div class="ps-section-head">
-          <h2 class="ps-h2">{{ t.how.title }}</h2>
-        </div>
-        <ol class="steps">
-          <li v-for="(s, i) in t.how.steps" :key="s.title" class="step">
-            <span class="step-n">{{ i + 1 }}</span>
-            <h3 class="step-title">{{ s.title }}</h3>
-            <p class="step-text">{{ s.text }}</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- 4 · recipes -->
+    <!-- 3 · recipes -->
     <section class="ps-section">
       <div class="ps-container">
         <div class="ps-section-head recipes-head">
@@ -282,67 +266,6 @@ const SAMPLE = `{
   font-size: var(--ps-text-sm) !important;
   font-weight: 400 !important;
   color: var(--vp-c-text-3) !important;
-}
-
-/* steps */
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  border-top: 1px solid var(--vp-c-divider);
-}
-@media (max-width: 820px) {
-  .steps {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.step {
-  padding: 24px 28px 28px 0;
-  border-right: 1px solid var(--vp-c-divider);
-  display: grid;
-  gap: 8px;
-  align-content: start;
-}
-.step:not(:first-child) {
-  padding-left: 28px;
-}
-.step:last-child {
-  border-right: none;
-}
-@media (max-width: 820px) {
-  .step {
-    border-right: none;
-    border-bottom: 1px solid var(--vp-c-divider);
-    padding: 20px 0;
-  }
-  .step:not(:first-child) {
-    padding-left: 0;
-  }
-  .step:last-child {
-    border-bottom: none;
-  }
-}
-.step-n {
-  font-family: var(--vp-font-family-mono);
-  font-size: var(--ps-text-xs);
-  color: var(--vp-c-brand-1);
-}
-.step-title {
-  margin: 0;
-  font-size: var(--ps-text-lg);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  border: none;
-  padding: 0;
-}
-.step-text {
-  margin: 0;
-  color: var(--vp-c-text-2);
-  line-height: 1.55;
-  max-width: 40ch;
 }
 
 /* recipes head */

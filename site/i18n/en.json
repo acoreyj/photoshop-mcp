@@ -47,23 +47,6 @@
     "title": "Works with the tools you already use",
     "more": "and any client that runs local MCP servers"
   },
-  "how": {
-    "title": "Three steps, no code",
-    "steps": [
-      {
-        "title": "Install",
-        "text": "One click in your client, or one command. The server runs on your own machine."
-      },
-      {
-        "title": "Open Photoshop",
-        "text": "Any version from 2012 on. Nothing to load inside Photoshop — the server talks to it directly."
-      },
-      {
-        "title": "Type a prompt",
-        "text": "Ask in plain language. The assistant reads the document, does the steps, and shows you a preview."
-      }
-    ]
-  },
   "recipes": {
     "title": "What you can ask for",
     "lead": "Sixteen ready-made workflows. Each one runs as a single undo step, so nothing is ever left half-done.",

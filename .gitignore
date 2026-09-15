@@ -65,6 +65,7 @@ site/public/images/
 site/public/llms.txt
 site/public/llms-full.txt
 site/.vitepress/dist
+site/.vitepress/cache
 site/node_modules
 
 *.tgz
