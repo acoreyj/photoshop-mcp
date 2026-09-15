@@ -12,13 +12,8 @@
       "you": "Tú",
       "prompt": "Quita el fondo de este retrato y exporta una versión de Instagram de 1080×1350.",
       "assistant": "Claude",
-      "steps": [
-        "get_state",
-        "recipe_remove_background · desvanecido 2px",
-        "recipe_export_social_variants · instagram_post"
-      ],
       "done": "Listo",
-      "result": "1080×1350 exportado a ~/.photoshop-mcp/exports. Un paso de deshacer.",
+      "result": "Exportado",
       "before": "Antes",
       "after": "Después"
     }

@@ -12,13 +12,8 @@
       "you": "You",
       "prompt": "Remove the background from this portrait and export a 1080×1350 Instagram version.",
       "assistant": "Claude",
-      "steps": [
-        "get_state",
-        "recipe_remove_background · feather 2px",
-        "recipe_export_social_variants · instagram_post"
-      ],
       "done": "Done",
-      "result": "Exported 1080×1350 to ~/.photoshop-mcp/exports. One undo step.",
+      "result": "Exported",
       "before": "Before",
       "after": "After"
     }

@@ -12,13 +12,8 @@
       "you": "あなた",
       "prompt": "このポートレートの背景を消して、1080×1350 の Instagram 用も書き出して。",
       "assistant": "Claude",
-      "steps": [
-        "get_state",
-        "recipe_remove_background · ぼかし 2px",
-        "recipe_export_social_variants · instagram_post"
-      ],
       "done": "完了",
-      "result": "1080×1350 を ~/.photoshop-mcp/exports に書き出しました。取り消しは 1 回分です。",
+      "result": "書き出しました",
       "before": "変更前",
       "after": "変更後"
     }

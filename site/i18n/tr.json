@@ -12,13 +12,8 @@
       "you": "Siz",
       "prompt": "Bu portrenin arka planını sil ve 1080×1350 Instagram versiyonunu dışa aktar.",
       "assistant": "Claude",
-      "steps": [
-        "get_state",
-        "recipe_remove_background · 2px yumuşatma",
-        "recipe_export_social_variants · instagram_post"
-      ],
       "done": "Tamam",
-      "result": "1080×1350 dosya ~/.photoshop-mcp/exports klasörüne aktarıldı. Tek geri alma adımı.",
+      "result": "Dışa aktarıldı",
       "before": "Önce",
       "after": "Sonra"
     }

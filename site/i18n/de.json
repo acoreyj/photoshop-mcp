@@ -12,13 +12,8 @@
       "you": "Du",
       "prompt": "Entferne den Hintergrund dieses Porträts und exportiere eine Instagram-Version in 1080×1350.",
       "assistant": "Claude",
-      "steps": [
-        "get_state",
-        "recipe_remove_background · 2 px weiche Kante",
-        "recipe_export_social_variants · instagram_post"
-      ],
       "done": "Fertig",
-      "result": "1080×1350 nach ~/.photoshop-mcp/exports exportiert. Ein Rückgängig-Schritt.",
+      "result": "Exportiert",
       "before": "Vorher",
       "after": "Nachher"
     }
