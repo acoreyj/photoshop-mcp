@@ -5,9 +5,23 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.7] - 2026-09-15
+
+[v1.7.6...HEAD](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.6...HEAD)
+
+### Fixes
+
+- Stop shipping a dangling `pageview.js` import that crashed `npx` installs with `MODULE_NOT_FOUND` ([#38](https://github.com/alisaitteke/photoshop-mcp/issues/38)).
+- Fall back from generative recipe paths when Photoshop rejects them (`remove-distraction`, `sky-blend`).
+
+### Changed
+
+- Let Action Plan run on CLI subscription accounts (Claude and Gemini), and turn the mode on by default.
+- Stop serving the marketing site from GitHub Pages.
+
 ## [1.7.6] - 2026-09-09
 
-[v1.7.5...HEAD](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.5...HEAD)
+[v1.7.5...v1.7.6](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.5...v1.7.6)
 
 ### Changed
 
