@@ -136,6 +136,12 @@ next. Common fixes: [`docs/troubleshooting.md`](docs/troubleshooting.md).
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
+## ❤️ Contributors & Credits
+
+Thanks to all our contributors!
+
+<a href="https://github.com/alisaitteke/photoshop-mcp/graphs/contributors"><img src="https://contrib.rocks/image?repo=alisaitteke/photoshop-mcp" alt="Contributors" /></a>
+
 ## Maintainer
 
 Built by **[Ali Sait Teke](https://alisait.com)** — [GitHub](https://github.com/alisaitteke) · [LinkedIn](https://www.linkedin.com/in/alisait/).
