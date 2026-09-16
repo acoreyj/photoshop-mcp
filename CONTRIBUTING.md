@@ -67,7 +67,7 @@ and refreshes release notes once npm is live.
    ```bash
    ./scripts/backfill-changelog.sh
    npm run sync:server-version
-   git add CHANGELOG.md package.json server.json
+   git add CHANGELOG.md package.json server.json .cursor-plugin/plugin.json
    git commit -m "X.Y.Z"
    git tag vX.Y.Z
    ```
@@ -163,6 +163,60 @@ deps (`better-sqlite3`) are compiled for the machine that runs `build:mcpb` — 
 on macOS for darwin bundles and on Windows for win32 if you need platform-specific
 artifacts.
 
+### Cursor Marketplace
+
+Cursor’s MCP list only shows a custom logo when the server is installed as a
+**Cursor Plugin**, not via a raw `mcp.json` / install-mcp deeplink. The plugin
+lives at the repo root:
+
+| Path | Purpose |
+| ---- | ------- |
+| [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json) | Plugin manifest (`logo`, name, version) |
+| [`mcp.json`](mcp.json) | Stdio server (`npx -y @alisaitteke/photoshop-mcp`) |
+| [`assets/logo.svg`](assets/logo.svg) | Icon referenced by `logo` |
+
+`npm run sync:server-version` keeps the plugin `version` aligned with
+`package.json`.
+
+#### Test locally (before / without Marketplace review)
+
+Cursor does **not** follow a symlink out of `~/.cursor/plugins/local`. Copy the
+plugin files (do not `ln -s` this repo):
+
+```bash
+PLUGIN="$HOME/.cursor/plugins/local/photoshop-mcp"
+mkdir -p "$PLUGIN/.cursor-plugin" "$PLUGIN/assets"
+cp .cursor-plugin/plugin.json "$PLUGIN/.cursor-plugin/"
+cp mcp.json "$PLUGIN/"
+cp assets/logo.svg "$PLUGIN/assets/"
+```
+
+Then **Developer: Reload Window**. Confirm **Customize → Plugins** shows
+`photoshop-mcp` with the local `assets/logo.svg` icon.
+
+Use a **relative** `logo` path (`assets/logo.svg`). Local plugins load that file
+from disk. An `https://` logo URL breaks the Plugins list for a local install
+(Cursor does not fetch it) and still does not paint the **MCP servers** list.
+
+The MCP servers list only shows custom icons for **Marketplace-installed**
+plugins (the same path Cloudflare / PostHog use). A local plugin’s MCP row
+stays generic until the listing is live on [cursor.com/marketplace](https://cursor.com/marketplace).
+
+If both a user `mcp.json` server named `photoshop` and the plugin are enabled,
+disable the duplicate `mcp.json` entry so only one listing remains.
+
+#### Submit for public listing
+
+1. Merge the plugin files to `master` and push.
+2. Open [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
+3. Submit `https://github.com/alisaitteke/photoshop-mcp`.
+4. Wait for Cursor’s manual review (each listing and each later update).
+5. After approval, users install from **Customize → Plugins**; keep the
+   install-mcp deeplink as a fallback until the Marketplace URL is wired into
+   README / the site.
+
+Do not claim the Marketplace listing is live until that review completes.
+
 ### PulseMCP
 
 Listing: [pulsemcp.com/servers/gh-alisaitteke-photoshop](https://www.pulsemcp.com/servers/gh-alisaitteke-photoshop)
@@ -201,6 +255,7 @@ Public site: [photoshop-mcp.com](https://photoshop-mcp.com/) (Cloudflare Worker,
 | `scripts/` | Integration and verification test scripts |
 | `site/` | Legacy VitePress tree (not deployed) |
 | `docs/` | Additional documentation (synced to the site at build time) |
+| `.cursor-plugin/`, `mcp.json`, `assets/` | Cursor Plugin (Marketplace logo) |
 
 See [`docs/architecture.md`](docs/architecture.md) for a detailed breakdown.
 

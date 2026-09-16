@@ -602,7 +602,9 @@ Für die lokale Entwicklung am Repository: [Aus dem Quellcode](docs/development.
 
 ### Für Cursor
 
-Zu den Cursor-Einstellungen (`.cursor/config.json` oder Workspace-Einstellungen) hinzufügen:
+Damit das Photoshop-Logo in der MCP-Liste erscheint, das Plugin unter **Customize → Plugins** installieren oder nach der Freigabe im [Cursor Marketplace](https://cursor.com/marketplace) nach `photoshop-mcp` suchen. Ein manuelles `mcp.json` funktioniert weiterhin, zeigt aber ein generisches Symbol.
+
+Zu den Cursor-Einstellungen (`~/.cursor/mcp.json` oder Workspace-Einstellungen) hinzufügen:
 
 ```json
 {

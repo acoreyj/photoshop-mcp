@@ -596,7 +596,9 @@ Depoyu yerel olarak geliştirmek için geliştirme kılavuzundaki [Kaynaktan](do
 
 ### Cursor için
 
-Cursor ayarlarınıza ekleyin (`.cursor/config.json` veya workspace ayarları):
+MCP listesinde Photoshop logosunun görünmesi için eklentiyi **Customize → Plugins** üzerinden kurun (veya listelendikten sonra [Cursor Marketplace](https://cursor.com/marketplace) içinde `photoshop-mcp` arayın). Ham `mcp.json` yedek olarak çalışır ama jenerik ikon gösterir.
+
+Cursor ayarlarınıza ekleyin (`.cursor/mcp.json` veya workspace ayarları):
 
 ```json
 {

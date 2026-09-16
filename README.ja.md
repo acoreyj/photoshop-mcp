@@ -559,7 +559,9 @@ npx @alisaitteke/photoshop-mcp
 
 ### Cursor向け
 
-Cursorの設定に追加してください（`.cursor/config.json`またはワークスペース設定）：
+MCPリストにPhotoshopロゴを表示するには、**Customize → Plugins** からプラグインをインストールするか、公開後に [Cursor Marketplace](https://cursor.com/marketplace) で `photoshop-mcp` を検索してください。手動の `mcp.json` でも動作しますが、汎用アイコンになります。
+
+Cursorの設定に追加してください（`~/.cursor/mcp.json`またはワークスペース設定）：
 
 ```json
 {

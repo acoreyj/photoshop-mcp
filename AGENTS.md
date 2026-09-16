@@ -7,7 +7,8 @@
 
 | Scenario | Path |
 | -------- | ---- |
-| Cursor / Claude Desktop / VS Code | Configure `mcpServers` → `npx -y @alisaitteke/photoshop-mcp` (stdio) |
+| Cursor | Install the `photoshop-mcp` plugin (Customize → Plugins / Marketplace) so the Photoshop logo appears in the MCP list. Fallback: `mcpServers` → `npx -y @alisaitteke/photoshop-mcp` (stdio, generic icon) |
+| Claude Desktop / VS Code | Configure `mcpServers` → `npx -y @alisaitteke/photoshop-mcp` (stdio) |
 | Claude Code | `claude mcp add photoshop -- npx -y @alisaitteke/photoshop-mcp` |
 | Standalone chat UI (no IDE) | `npx -p @alisaitteke/photoshop-mcp photoshop-mcp-ui` |
 | Local development | `npm install && npm run build && node dist/index.js` — see [docs/development.md](docs/development.md) |
@@ -58,6 +59,8 @@ Full catalog: [docs/available-tools.md](docs/available-tools.md). Prompt layer: 
 
 ## MCP client configuration
 
+Cursor: prefer the `photoshop-mcp` plugin (Customize → Plugins) so the Photoshop logo appears in the MCP list. Other hosts and the install-mcp deeplink use:
+
 ```json
 {
   "mcpServers": {
@@ -99,6 +102,7 @@ More: [docs/troubleshooting.md](docs/troubleshooting.md).
 | npm | `@alisaitteke/photoshop-mcp` |
 | MCP Registry | `io.github.alisaitteke/photoshop-mcp` |
 | GitHub | https://github.com/alisaitteke/photoshop-mcp |
+| Cursor Marketplace | plugin `photoshop-mcp` (submit via [CONTRIBUTING.md](CONTRIBUTING.md#cursor-marketplace)) |
 
 ## Key files
 
@@ -111,6 +115,8 @@ More: [docs/troubleshooting.md](docs/troubleshooting.md).
 | [src/tools/](src/tools/) | Tool implementations |
 | [src/prompts/](src/prompts/) | MCP prompt templates |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | PR and release workflow |
+| [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json) | Cursor Plugin manifest (MCP list logo) |
+| [`mcp.json`](mcp.json) | Cursor Plugin stdio server config |
 
 ## Contributing (agents editing this repo)
 

@@ -557,7 +557,9 @@ Para trabajar en el repositorio localmente, consulte [From Source](docs/developm
 
 ### Para Cursor
 
-Añada a su configuración de Cursor (`.cursor/config.json` o la configuración del espacio de trabajo):
+Para que el logo de Photoshop aparezca en la lista MCP, instale el plugin desde **Customize → Plugins**, o busque `photoshop-mcp` en el [Cursor Marketplace](https://cursor.com/marketplace) cuando esté publicado. Un `mcp.json` manual sigue funcionando, pero muestra un icono genérico.
+
+Añada a su configuración de Cursor (`~/.cursor/mcp.json` o la configuración del espacio de trabajo):
 
 ```json
 {

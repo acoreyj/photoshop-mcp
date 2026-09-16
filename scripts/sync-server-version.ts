@@ -1,5 +1,5 @@
 /**
- * Sync server.json with package.json before npm publish.
+ * Sync server.json and the Cursor plugin manifest with package.json before npm publish.
  * Copies version + description so the MCP registry listing never goes stale.
  * Run: npx tsx scripts/sync-server-version.ts   (wired into prepublishOnly)
  */
@@ -28,3 +28,9 @@ if (Array.isArray(server.packages)) {
 
 writeFileSync(serverPath, JSON.stringify(server, null, 2) + '\n');
 console.log(`server.json synced to v${pkg.version}`);
+
+const pluginPath = join(ROOT, '.cursor-plugin', 'plugin.json');
+const plugin = JSON.parse(readFileSync(pluginPath, 'utf8'));
+plugin.version = pkg.version;
+writeFileSync(pluginPath, JSON.stringify(plugin, null, 2) + '\n');
+console.log(`.cursor-plugin/plugin.json synced to v${pkg.version}`);

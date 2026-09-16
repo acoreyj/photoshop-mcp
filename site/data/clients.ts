@@ -98,8 +98,11 @@ export const CLIENTS: ClientDef[] = [
       },
       location: 'Cursor Settings → MCP → Add new MCP server',
     },
-    steps: ['Click Install in Cursor and accept the prompt.', 'If nothing opens, paste the JSON into mcp.json.'],
-    docs: 'https://cursor.com/docs/mcp',
+    steps: [
+      'Preferred (logo in the MCP list): install the photoshop-mcp plugin from Customize → Plugins, or search the Cursor Marketplace once it is listed.',
+      'Fallback: click Install in Cursor (or paste the JSON into mcp.json). That path uses a generic icon.',
+    ],
+    docs: 'https://cursor.com/docs/plugins',
     platforms: ['mac', 'windows', 'linux'],
     verifyHint: 'Open Agent mode and ask: "Ping Photoshop and list open documents."',
     logo: true,

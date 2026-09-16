@@ -89,6 +89,10 @@ Details, providers, Action Plan (API key or CLI account), and security notes:
 
 ### Option 2 — Inside your AI app (Cursor, Claude, VS Code)
 
+**Cursor (shows the Photoshop logo in the MCP list):** install the plugin from **Customize → Plugins**, or search the [Cursor Marketplace](https://cursor.com/marketplace) for `photoshop-mcp` once it is listed. That package still launches `npx -y @alisaitteke/photoshop-mcp`; the plugin manifest is what supplies the icon.
+
+Until the Marketplace listing is live, copy `.cursor-plugin/`, `mcp.json`, and `assets/` into `~/.cursor/plugins/local/photoshop-mcp` and reload the window — details in [CONTRIBUTING.md](CONTRIBUTING.md#cursor-marketplace). The Install-in-Cursor button and a raw `mcp.json` entry still work, but they show a generic icon.
+
 [![Install in Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=photoshop&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBhbGlzYWl0dGVrZS9waG90b3Nob3AtbWNwIl19)
 [![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-0098FF)](https://vscode.dev/redirect/mcp/install?name=photoshop&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40alisaitteke%2Fphotoshop-mcp%22%5D%7D)
 

@@ -554,7 +554,9 @@ npx @alisaitteke/photoshop-mcp
 
 ### 适用于 Cursor
 
-在您的 Cursor 设置（`.cursor/config.json` 或工作区设置）中添加：
+若要在 MCP 列表中显示 Photoshop 图标，请从 **Customize → Plugins** 安装插件，或在插件上架后于 [Cursor Marketplace](https://cursor.com/marketplace) 搜索 `photoshop-mcp`。直接写入 `mcp.json` 仍可用，但会显示通用图标。
+
+在您的 Cursor 设置（`~/.cursor/mcp.json` 或工作区设置）中添加：
 
 ```json
 {
