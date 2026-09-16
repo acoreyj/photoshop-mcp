@@ -5,6 +5,15 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.15] - 2026-09-16
+
+[v1.7.14...v1.7.15](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.14...v1.7.15)
+
+### Other
+
+- Add Cursor plugin packaging so the MCP list can show the Photoshop logo. (`6e931d7`)
+- Prefer native Remove Background and unlock locked Background layers in the recipe. (`e8d3f8e`)
+
 ## [1.7.14] - 2026-09-15
 
 [v1.7.13...v1.7.14](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.13...v1.7.14)
@@ -13,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Drop the three-step how-it-works section and ignore the VitePress cache. (`fa4dbcf`)
 - Simplify the homepage demo card by dropping tool-call steps and export details. (`0eff6b4`)
+
+### Version bumps
+
+- 1.7.14 (`bbceb82`)
 
 ## [1.7.13] - 2026-09-15
 
