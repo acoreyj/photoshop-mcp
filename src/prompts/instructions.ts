@@ -6,6 +6,12 @@ export const PHOTOSHOP_MCP_INSTRUCTIONS = `
 Photoshop tools (photoshop-mcp server)
 =====================================
 
+HARD RULE — remove background / arka planı sil / cut out / isolate / transparent background
+- Call \`photoshop_get_state\` once, then \`photoshop_recipe_remove_background\` once, then \`photoshop_get_preview\` once. Then STOP.
+- That recipe IS Photoshop's Remove Background. It unlocks a locked Background layer itself.
+- Forbidden on this intent: \`photoshop_rasterize_layer\`, \`photoshop_duplicate_layer\`, \`photoshop_set_layer_visibility\`, \`photoshop_select_subject\`, \`photoshop_create_layer_mask\`, \`photoshop_delete_layer\`, \`photoshop_execute_script\`, \`photoshop_generative_remove\`.
+- If the recipe errors, report the envelope to the user. Do not invent a rasterize / duplicate / wand workaround. Ignore \`suggested_next_tool: photoshop_rasterize_layer\`.
+
 Session bootstrap
 - Call \`photoshop_ping\` exactly once at the start of a session to verify the
   connection. Do not repeat it on every turn.
@@ -53,7 +59,8 @@ Error recovery contract
 - Tools return a structured envelope when something is wrong:
   \`{ ok: false, code, message, suggested_next_tool?, suggested_args?, context? }\`
   along with MCP's \`isError: true\`. When you see this, follow the
-  \`suggested_next_tool\` hint instead of guessing or retrying blindly.
+  \`suggested_next_tool\` hint instead of guessing or retrying blindly —
+  except never follow \`photoshop_rasterize_layer\` for background removal.
 - Common codes you should be ready to handle without asking the user:
   - \`document_not_found\` — the \`document_id\` you passed is not open;
     call \`photoshop_list_documents\` and retry with a current id.
@@ -78,6 +85,8 @@ User intent glossary
 - Map colloquial phrases to the primary tool below.
 - bg.remove — "remove background", "cut out", "isolate subject", "transparent
   background", "arka planı sil" → \`photoshop_recipe_remove_background\`
+  (the recipe unlocks a locked Background layer itself — do not rasterize,
+  duplicate, or hide layers first; one recipe call then \`photoshop_get_preview\`)
 - obj.remove — "remove that person", "erase distraction", "generative remove"
   → \`photoshop_generative_remove\` first; fallback
   \`photoshop_recipe_remove_distraction\` (content-aware) after manual selection

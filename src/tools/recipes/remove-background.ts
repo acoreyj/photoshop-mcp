@@ -1,7 +1,6 @@
 import { ToolDefinition, ToolResult } from '../../core/tool-registry.js';
 import { PhotoshopConnection } from '../../platform/connection.js';
-import { PhotoshopDetector } from '../../platform/detector.js';
-import { clampInt, executeRecipe, toolFailure } from './_shared.js';
+import { clampInt, executeRecipe } from './_shared.js';
 
 const TOOL_NAME = 'photoshop_recipe_remove_background';
 
@@ -10,17 +9,15 @@ export function bindRemoveBackground(connection: PhotoshopConnection): ToolDefin
     tool: {
       name: TOOL_NAME,
       description:
-        'One-shot background removal: Select Subject by default, with an automatic Color Range fallback for uniform/high-key studio backgrounds (product-on-white). Attaches a layer mask (source pixels kept). Wrapped in a single undoable history step.\n' +
+        'THE tool for "remove background" / "arka planı sil" / cut out / isolate subject. Call this once and stop. Unlocks a locked Background layer, then runs Photoshop native Remove Background (Select Subject / Color Range only if native is unavailable). One undo reverts everything.\n' +
         '\n' +
-        'Users often say: cut out, isolate subject, remove background, transparent background, arka planı sil.\n' +
+        'Use when: the user wants the background gone. Hair, busy interiors, product shots — still this tool.\n' +
+        'Do NOT rasterize, duplicate, hide layers, select_subject, create_layer_mask, or execute_script instead of this recipe.\n' +
         '\n' +
-        'Use when: the user wants the subject isolated from the background non-destructively.\n' +
-        'Do NOT use when: the subject is extremely fine-edged (hair against a busy background) — propose a manual Refine Edge pass afterwards.\n' +
+        'Returns: { ok, summary, undo_history_states_consumed, details.method = remove_background | remove_layer_background | select_subject | color_range_fallback }.\n' +
         '\n' +
-        'Returns: { ok, summary, undo_history_states_consumed, details.method = select_subject | color_range_fallback }.\n' +
-        '\n' +
-        'Preconditions: PS ≥ 23 (Select Subject v2) for the default path; Color Range fallback still runs on uniform studio shots if Select Subject is loose or empty.\n' +
-        'Side effects: attaches a pixel mask to the active layer; no pixels destroyed; one undo reverts everything.',
+        'Preconditions: an active document. Native Remove Background needs a current Photoshop; Select Subject fallback needs PS ≥ 23.\n' +
+        'Side effects: may unlock/rename the Background layer; attaches a pixel mask; no pixels destroyed; one undo reverts everything.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -59,24 +56,23 @@ async function runRemoveBackground(
   const keepShadow = args.keep_shadow === true;
 
   await connection.ping().catch(() => undefined);
-  const info = connection.getPhotoshopInfo();
-  if (info) {
-    const detector = new PhotoshopDetector();
-    if (!detector.supportsSelectSubjectV2(info.version)) {
-      return toolFailure({
-        ok: false,
-        code: 'version_unsupported',
-        message: `Select Subject v2 requires Photoshop 23.0+; detected version ${info.version}. Upgrade Photoshop or remove the background manually.`,
-        suggested_next_tool: 'photoshop_get_capabilities',
-      });
-    }
-  }
 
   const body = `
     var doc = app.activeDocument;
     var layer = doc.activeLayer;
+    var convertedBackground = false;
     if (layer.isBackgroundLayer) {
-      return { ok: false, code: 'no_active_layer', message: 'Active layer is the Background layer — convert it to a normal layer first.', suggested_next_tool: 'photoshop_rasterize_layer' };
+      try {
+        var previousName = String(layer.name);
+        layer.isBackgroundLayer = false;
+        convertedBackground = true;
+        layer = doc.activeLayer;
+        if (previousName === 'Background' || layer.name === 'Background' || layer.name === 'Layer 0') {
+          layer.name = 'Subject';
+        }
+      } catch (eBg) {
+        return { ok: false, code: 'no_active_layer', message: 'Could not unlock the Background layer.', suggested_next_tool: 'photoshop_get_state' };
+      }
     }
 
     app.displayDialogs = DialogModes.NO;
@@ -194,6 +190,70 @@ async function runRemoveBackground(
       }
     }
 
+    function __mcp_hasMask() {
+      try {
+        var maskRef = new ActionReference();
+        maskRef.putEnumerated(stringIDToTypeID('layer'), stringIDToTypeID('ordinal'), stringIDToTypeID('targetEnum'));
+        var maskDesc = executeActionGet(maskRef);
+        return maskDesc.hasKey(stringIDToTypeID('userMaskEnabled'));
+      } catch (eMask) {
+        return false;
+      }
+    }
+
+    function __mcp_tryNativeRemoveBackground() {
+      try {
+        executeAction(stringIDToTypeID('removeBackground'), new ActionDescriptor(), DialogModes.NO);
+        return __mcp_hasMask();
+      } catch (eNative) {
+        return false;
+      }
+    }
+
+    function __mcp_tryRemoveLayerBackground() {
+      try {
+        var rlDesc = new ActionDescriptor();
+        var rlRef = new ActionReference();
+        rlRef.putEnumerated(stringIDToTypeID('layer'), stringIDToTypeID('ordinal'), stringIDToTypeID('targetEnum'));
+        rlDesc.putReference(stringIDToTypeID('null'), rlRef);
+        executeAction(stringIDToTypeID('removeLayerBackground'), rlDesc, DialogModes.NO);
+        return __mcp_hasMask();
+      } catch (eLayerBg) {
+        return false;
+      }
+    }
+
+    if (__mcp_tryNativeRemoveBackground()) {
+      return {
+        ok: true,
+        summary: 'Background removed via native Remove Background + layer mask',
+        undo_history_states_consumed: 1,
+        next_suggested_tool: 'photoshop_get_preview',
+        details: {
+          feather_px: ${feather},
+          keep_shadow: ${keepShadow ? 'true' : 'false'},
+          layer_name: layer.name,
+          method: 'remove_background',
+          converted_background: convertedBackground
+        }
+      };
+    }
+    if (__mcp_tryRemoveLayerBackground()) {
+      return {
+        ok: true,
+        summary: 'Background removed via Remove Layer Background + layer mask',
+        undo_history_states_consumed: 1,
+        next_suggested_tool: 'photoshop_get_preview',
+        details: {
+          feather_px: ${feather},
+          keep_shadow: ${keepShadow ? 'true' : 'false'},
+          layer_name: layer.name,
+          method: 'remove_layer_background',
+          converted_background: convertedBackground
+        }
+      };
+    }
+
     var studio = __mcp_detectStudio();
     var method = 'select_subject';
     var subjectOk = __mcp_trySelectSubject();
@@ -241,7 +301,8 @@ async function runRemoveBackground(
         feather_px: ${feather},
         keep_shadow: ${keepShadow ? 'true' : 'false'},
         layer_name: layer.name,
-        method: method
+        method: method,
+        converted_background: convertedBackground
       }
     };
   `;
