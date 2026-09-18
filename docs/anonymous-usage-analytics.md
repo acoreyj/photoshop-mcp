@@ -84,18 +84,24 @@ be filtered apart from marketing-site traffic.
 
 | Event | When | Key properties |
 | --- | --- | --- |
-| pageview (`/mcp`) | MCP session start | `usage_surface: mcp` |
-| `mcp_session_started` | MCP process start (stdio server up) | `app_version`, `photoshop_detected`, `tools_registered_count` |
-| `mcp_client_connected` | MCP client completed initialize handshake | `mcp_client_name`, `mcp_client_version`, `mcp_client_connect_count` |
-| `mcp_client_disconnected` | MCP transport closed | `mcp_client_name?`, `mcp_client_version?` |
+| pageview (`/mcp`) | Logical MCP session start (not every stdio spawn) | `usage_surface: mcp` |
+| `mcp_session_started` | Logical session start — first process in a 30-minute idle window | `app_version`, `photoshop_detected`, `tools_registered_count` |
+| `mcp_client_connected` | First initialize handshake in that window, or a different MCP client name/version | `mcp_client_name`, `mcp_client_version`, `mcp_client_connect_count` |
 | `mcp_session_startup_failed` | Startup error | `ok: false`, `error_code` |
-| `mcp_photoshop_connection` | Initial connect or failed reconnect | `ok`, `photoshop_connected`, `error_code?` |
+| `mcp_photoshop_connection` | Fresh Photoshop detect or failed reconnect — not a cached detect | `ok`, `photoshop_connected`, `error_code?` |
 | `mcp_photoshop_first_connected` | First successful Photoshop connection (once per install) | `event_source: mcp` |
 | `mcp_first_tool_success` | First successful tool call (once per install) | `tool_name`, `event_source: mcp` |
 | `mcp_tool_batch` | 3s after last tool, 60s max hold, client disconnect, or session end | `tools_called_count`, `tools_error_count`, `unique_tools_count`, `tool_usage_summary`, `tools_used[]`, `had_errors`, `error_codes[]?`, `error_codes_summary?`, `batch_flush_reason`, `mcp_client_name?` |
 | `mcp_prompt_requested` | Prompt template fetch | `prompt_name` |
-| `pageleave` | Graceful shutdown (SIGINT/SIGTERM/stdio close) | `duration_ms`, `shutdown_reason` |
-| `mcp_session_ended` | Graceful shutdown | `duration_ms`, `shutdown_reason` |
+| `pageleave` | Previous logical session closed after 30 minutes idle (next process start) | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
+| `mcp_session_ended` | Previous logical session closed after 30 minutes idle | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
+
+Cursor and similar hosts often kill and respawn the stdio process per chat. Lifecycle events
+are therefore keyed to a **logical session** persisted at `~/.photoshop-mcp/mcp-logical-session.json`
+(30-minute idle timeout), not to each Node process. Stdio close still flushes `mcp_tool_batch`
+but does not emit `mcp_client_disconnected` / `mcp_session_ended`. Photoshop install detection
+is cached for 24 hours at `~/.photoshop-mcp/photoshop-detect-cache.json` so Spotlight/registry
+does not run on every spawn (`PHOTOSHOP_PATH` bypasses the cache).
 
 Tool usage is **not** sent per call. Calls are aggregated in memory and flushed as
 `mcp_tool_batch` when the MCP client pauses for 3 seconds after the last tool in a
@@ -211,7 +217,7 @@ Filter marketing-site traffic by pathname **not** in `/mcp`, `/ui`, `/ui-server`
 | Country breakdown | Segment `mcp_tool_batch` or `/mcp` pageviews by country |
 | Tool error rate | `mcp_tool_batch` where `had_errors = true`, segment by `error_codes` or `error_codes_summary` |
 | Photoshop reachability | `mcp_photoshop_connection` where `ok = false` |
-| Session duration | Average `duration_ms` on `mcp_session_ended` or `ui_server_ended` |
+| Session duration | Average `duration_ms` on `mcp_session_ended` (`idle_timeout`) or `ui_server_ended` |
 | MCP vs UI usage | User trait `usage_surfaces` (comma-separated: `mcp`, `server`, `web`) |
 | Standalone UI model | User `active_provider` / `active_model` or event `ui_model_selected` |
 | Marketing site traffic | Pageviews excluding `/mcp`, `/ui`, `/ui-server` |

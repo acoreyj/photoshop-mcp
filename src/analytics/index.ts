@@ -16,6 +16,7 @@ import {
   captureMcpPageview,
   endMcpAnalyticsSession,
   recordMcpToolCall,
+  startLogicalMcpAnalyticsSession,
   startMcpAnalyticsSession,
 } from './mcp-session.js';
 import { getAnalytics, resetAnalyticsProvider, shutdownAnalyticsClient } from './provider.js';
@@ -116,6 +117,7 @@ export {
   recordMcpToolCall,
   resetAnalyticsProvider,
   setBetaTelemetryChoice,
+  startLogicalMcpAnalyticsSession,
   startMcpAnalyticsSession,
 };
 export type {
