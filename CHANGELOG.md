@@ -5,6 +5,15 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.16] - 2026-09-18
+
+[v1.7.15...v1.7.16](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.15...v1.7.16)
+
+### Other
+
+- Treat Cursor stdio respawns as one analytics session and cache Photoshop detection. (`fc4734c`)
+- Show GitHub contributors in the README so credit is visible. (`437efc3`)
+
 ## [1.7.15] - 2026-09-16
 
 [v1.7.14...v1.7.15](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.14...v1.7.15)
@@ -13,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add Cursor plugin packaging so the MCP list can show the Photoshop logo. (`6e931d7`)
 - Prefer native Remove Background and unlock locked Background layers in the recipe. (`e8d3f8e`)
+
+### Version bumps
+
+- 1.7.15 (`3b28983`)
 
 ## [1.7.14] - 2026-09-15
 
