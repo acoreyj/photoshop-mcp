@@ -87,6 +87,9 @@ const ALLOWED_PROPERTY_KEYS = new Set([
   'active_model',
   'model',
   'last_active_at',
+  'feedback_choice',
+  'has_suggestion',
+  'suggestion',
 ]);
 
 const ANALYTICS_RESERVED_PROPERTY_KEYS = new Set(['$current_url', '$pathname', '$screen_name']);

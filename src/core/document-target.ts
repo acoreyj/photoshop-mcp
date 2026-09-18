@@ -11,6 +11,7 @@ export const DOCUMENT_ID_SCHEMA_EXCLUDES = new Set([
   'photoshop_get_capabilities',
   'photoshop_list_documents',
   'photoshop_set_active_document',
+  'photoshop_submit_feedback',
 ]);
 
 export const DOCUMENT_ID_PROPERTY = {

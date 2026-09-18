@@ -4,8 +4,7 @@ import { stepCountIs, streamText } from 'ai';
 import type { ProviderAdapter } from '../providers/registry.js';
 import type { AuthMethod } from '../providers/types.js';
 import type { ModelMessage } from 'ai';
-import { buildSpawnArgs, sanitizedEnv } from './mcp-transport.js';
-import { PHOTOSHOP_EXPORT_CHAT_ID_ENV } from '../../lib/export-paths.js';
+import { buildSpawnArgs, buildUiMcpChildEnv } from './mcp-transport.js';
 import {
   computeCost,
   isToolOutputOk,
@@ -41,11 +40,7 @@ export async function* runChatViaApiKey(
       transport: new Experimental_StdioMCPTransport({
         command: process.execPath,
         args: buildSpawnArgs(),
-        env: {
-          ...sanitizedEnv(),
-          LOG_LEVEL: process.env.LOG_LEVEL ?? '2',
-          ...(opts.chatId ? { [PHOTOSHOP_EXPORT_CHAT_ID_ENV]: opts.chatId } : {}),
-        },
+        env: buildUiMcpChildEnv(opts.chatId),
       }),
     });
 

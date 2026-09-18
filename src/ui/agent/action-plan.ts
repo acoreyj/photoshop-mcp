@@ -2,10 +2,9 @@ import { createMCPClient, type MCPClient } from '@ai-sdk/mcp';
 import { Experimental_StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio';
 import type { LanguageModelUsage, ModelMessage } from 'ai';
 import { randomUUID } from 'node:crypto';
-import { PHOTOSHOP_EXPORT_CHAT_ID_ENV } from '../../lib/export-paths.js';
 import type { ProviderAdapter } from '../providers/registry.js';
 import type { AuthMethod } from '../providers/types.js';
-import { buildSpawnArgs, sanitizedEnv } from './mcp-transport.js';
+import { buildSpawnArgs, buildUiMcpChildEnv } from './mcp-transport.js';
 import {
   buildToolCatalog,
   toPartialPlanView,
@@ -105,11 +104,7 @@ export async function* runChatViaActionPlan(
       transport: new Experimental_StdioMCPTransport({
         command: process.execPath,
         args: buildSpawnArgs(),
-        env: {
-          ...sanitizedEnv(),
-          LOG_LEVEL: process.env.LOG_LEVEL ?? '2',
-          ...(opts.chatId ? { [PHOTOSHOP_EXPORT_CHAT_ID_ENV]: opts.chatId } : {}),
-        },
+        env: buildUiMcpChildEnv(opts.chatId),
       }),
     });
 

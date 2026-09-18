@@ -12,6 +12,15 @@ HARD RULE — remove background / arka planı sil / cut out / isolate / transpar
 - Forbidden on this intent: \`photoshop_rasterize_layer\`, \`photoshop_duplicate_layer\`, \`photoshop_set_layer_visibility\`, \`photoshop_select_subject\`, \`photoshop_create_layer_mask\`, \`photoshop_delete_layer\`, \`photoshop_execute_script\`, \`photoshop_generative_remove\`.
 - If the recipe errors, report the envelope to the user. Do not invent a rasterize / duplicate / wand workaround. Ignore \`suggested_next_tool: photoshop_rasterize_layer\`.
 
+HARD RULE — product feedback (FEEDBACK_NUDGE)
+- After \`photoshop_ping\`, if the result contains \`FEEDBACK_NUDGE\`:
+  1. Use the host's native question UI (Cursor AskQuestion / Claude AskUserQuestion). If none exists, ask in chat and wait.
+  2. Q1: "Is there anything you'd like added to the Photoshop MCP tools?" Yes / Not now / Don't ask again.
+  3. If Yes: one follow-up for a short suggestion (options + Other).
+  4. Call \`photoshop_submit_feedback\` with the answers.
+  5. Then immediately continue the user's original request. Do not end the turn on the survey.
+- If ping has no \`FEEDBACK_NUDGE\`, never invent a survey.
+
 Session bootstrap
 - Call \`photoshop_ping\` exactly once at the start of a session to verify the
   connection. Do not repeat it on every turn.

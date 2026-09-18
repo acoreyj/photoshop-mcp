@@ -93,6 +93,7 @@ be filtered apart from marketing-site traffic.
 | `mcp_first_tool_success` | First successful tool call (once per install) | `tool_name`, `event_source: mcp` |
 | `mcp_tool_batch` | 3s after last tool, 60s max hold, client disconnect, or session end | `tools_called_count`, `tools_error_count`, `unique_tools_count`, `tool_usage_summary`, `tools_used[]`, `had_errors`, `error_codes[]?`, `error_codes_summary?`, `batch_flush_reason`, `mcp_client_name?` |
 | `mcp_prompt_requested` | Prompt template fetch | `prompt_name` |
+| `mcp_product_feedback` | User answered the optional MCP product-feedback nudge | `feedback_choice` (`yes` / `not_now` / `dont_ask`), `has_suggestion`, `suggestion?` (truncated), `event_source: mcp` |
 | `pageleave` | Previous logical session closed after 30 minutes idle (next process start) | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
 | `mcp_session_ended` | Previous logical session closed after 30 minutes idle | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
 
@@ -110,6 +111,12 @@ when the session ends or the MCP client disconnects.
 
 One-time funnel milestones (`mcp_first_tool_success`, `mcp_photoshop_first_connected`)
 use a persisted local flag only.
+
+The optional product-feedback nudge is shown after a successful `photoshop_ping` on
+first MCP use, then at most once every 7 days until the user answers `yes` or
+`dont_ask`. It is skipped when analytics are disabled and when the server is
+spawned by the standalone UI (`PHOTOSHOP_MCP_SURFACE=ui`). Asking is consent:
+the question states that the answer is sent anonymously.
 
 ## Model tracking
 
@@ -140,7 +147,10 @@ the browser UI uses `/ui`.
 ## What we do **not** collect (unless you opt into beta team sharing)
 
 - API keys or OAuth tokens
-- Chat messages, prompts, or model responses **by default**
+- Chat messages, prompts, or model responses **by default** (the optional MCP
+  product-feedback nudge is the exception: if you answer Q1, `choice` and an
+  optional truncated `suggestion` are sent as `mcp_product_feedback`; the nudge
+  is not shown when analytics are off)
 - Photoshop document or layer names, file paths, or image content
 - CLI account labels, email addresses, or other account identifiers
 - Tool call **arguments** or **results** (MCP logs tool **names** only)

@@ -7,7 +7,12 @@ import {
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Logger } from '../utils/logger.js';
-import { capture, onMcpClientConnected, onMcpClientDisconnected, recordMcpToolCall } from '../analytics/index.js';
+import {
+  capture,
+  onMcpClientConnected,
+  onMcpClientDisconnected,
+  recordMcpToolCall,
+} from '../analytics/index.js';
 import { ToolRegistry, ToolDefinition } from './tool-registry.js';
 import { PromptRegistry } from './prompt-registry.js';
 import { Session } from './session.js';
@@ -40,6 +45,7 @@ import { createDataTools } from '../tools/data-tools.js';
 import { createStackTools } from '../tools/stack-tools.js';
 import { createExportTools } from '../tools/export-tools.js';
 import { ensureUxpBridgeServer } from '../platform/uxp-bridge-server.js';
+import { buildPingToolResult, submitFeedbackFromArgs } from '../feedback/nudge.js';
 
 export interface PhotoshopMCPServerOptions {
   serverVersion: string;
@@ -97,11 +103,40 @@ export class PhotoshopMCPServer {
           'Verify Photoshop is installed and reachable on this machine.\n\n' +
           'Use when: once at session start if connection status is unknown.\n' +
           'Do NOT use when: on every tool call — call once, then use photoshop_get_state.\n\n' +
-          'Returns: connection success or failure message.\n' +
+          'Returns: connection success or failure message. May append a FEEDBACK_NUDGE block on first use / weekly cooldown.\n' +
           'Preconditions: none. Side effects: may trigger Photoshop detection.',
         inputSchema: { type: 'object', properties: {} },
       },
       handler: async () => this.pingPhotoshop(),
+    });
+
+    this.registerToolDefinition({
+      tool: {
+        name: 'photoshop_submit_feedback',
+        description:
+          "Record the user's answer to a Photoshop MCP product-feedback nudge.\n\n" +
+          'Use when: photoshop_ping returned a FEEDBACK_NUDGE block and you already asked the user via the host question UI (Cursor AskQuestion / Claude AskUserQuestion) or chat.\n' +
+          'Do NOT use when: ping had no FEEDBACK_NUDGE — never invent a survey.\n\n' +
+          "Returns: { ok, recorded, next }. After this call, immediately continue the user's original Photoshop request.\n" +
+          'Preconditions: none. Side effects: persists a local cooldown flag and may send an anonymous analytics event.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            choice: {
+              type: 'string',
+              enum: ['yes', 'not_now', 'dont_ask'],
+              description:
+                'yes = they have a feature request; not_now = skip this week; dont_ask = never prompt again',
+            },
+            suggestion: {
+              type: 'string',
+              description: 'Short feature request. Include when choice is yes; omit otherwise.',
+            },
+          },
+          required: ['choice'],
+        },
+      },
+      handler: async (args) => submitFeedbackFromArgs(args),
     });
 
     this.registerToolDefinition({
@@ -203,16 +238,7 @@ export class PhotoshopMCPServer {
   private async pingPhotoshop() {
     const connection = this.session.getConnection();
     const isConnected = await connection.ping();
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: isConnected
-            ? 'Successfully connected to Photoshop'
-            : 'Failed to connect to Photoshop',
-        },
-      ],
-    };
+    return buildPingToolResult(isConnected);
   }
 
   private async getVersion() {

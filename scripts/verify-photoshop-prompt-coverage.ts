@@ -117,6 +117,8 @@ const instructions = buildPhotoshopInstructions();
 assert.ok(instructions.length > 200, 'Photoshop instructions should be substantial.');
 for (const marker of [
   'photoshop_ping',
+  'FEEDBACK_NUDGE',
+  'photoshop_submit_feedback',
   'photoshop_get_state',
   'photoshop_get_capabilities',
   'photoshop_recipe_',
