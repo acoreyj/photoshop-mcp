@@ -103,7 +103,7 @@ export class PhotoshopMCPServer {
           'Verify Photoshop is installed and reachable on this machine.\n\n' +
           'Use when: once at session start if connection status is unknown.\n' +
           'Do NOT use when: on every tool call — call once, then use photoshop_get_state.\n\n' +
-          'Returns: connection success or failure message. May append a FEEDBACK_NUDGE block on first use / weekly cooldown.\n' +
+          'Returns: connection success or failure message. May append a FEEDBACK_NUDGE block 15 minutes after the first successful ping, then at most once per 7 days.\n' +
           'Preconditions: none. Side effects: may trigger Photoshop detection.',
         inputSchema: { type: 'object', properties: {} },
       },

@@ -80,7 +80,8 @@ also sets `localStorage.disable-rybbit`.
 When you run `photoshop-mcp` directly (e.g. via Cursor MCP config), these events
 are sent via `POST https://hey.sideguard.io/api/track` using the embedded site ID.
 Server events use `hostname: photoshop-mcp.com` and `pathname: /mcp` so they can
-be filtered apart from marketing-site traffic.
+be filtered apart from marketing-site traffic. Product-feedback events use
+pathname `/feedback` instead.
 
 | Event | When | Key properties |
 | --- | --- | --- |
@@ -93,7 +94,7 @@ be filtered apart from marketing-site traffic.
 | `mcp_first_tool_success` | First successful tool call (once per install) | `tool_name`, `event_source: mcp` |
 | `mcp_tool_batch` | 3s after last tool, 60s max hold, client disconnect, or session end | `tools_called_count`, `tools_error_count`, `unique_tools_count`, `tool_usage_summary`, `tools_used[]`, `had_errors`, `error_codes[]?`, `error_codes_summary?`, `batch_flush_reason`, `mcp_client_name?` |
 | `mcp_prompt_requested` | Prompt template fetch | `prompt_name` |
-| `mcp_product_feedback` | User answered the optional MCP product-feedback nudge | `feedback_choice` (`yes` / `not_now` / `dont_ask`), `has_suggestion`, `suggestion?` (truncated), `event_source: mcp` |
+| `mcp_product_feedback` | User answered the optional MCP product-feedback nudge | pathname `/feedback`; Rybbit `page_title` is the suggestion (or the choice if none); `feedback_choice` (`yes` / `not_now` / `dont_ask`), `has_suggestion`, `suggestion?` (truncated), `event_source: mcp` |
 | `pageleave` | Previous logical session closed after 30 minutes idle (next process start) | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
 | `mcp_session_ended` | Previous logical session closed after 30 minutes idle | `duration_ms`, `shutdown_reason` (`idle_timeout`) |
 
@@ -112,11 +113,14 @@ when the session ends or the MCP client disconnects.
 One-time funnel milestones (`mcp_first_tool_success`, `mcp_photoshop_first_connected`)
 use a persisted local flag only.
 
-The optional product-feedback nudge is shown after a successful `photoshop_ping` on
-first MCP use, then at most once every 7 days until the user answers `yes` or
-`dont_ask`. It is skipped when analytics are disabled and when the server is
-spawned by the standalone UI (`PHOTOSHOP_MCP_SURFACE=ui`). Asking is consent:
-the question states that the answer is sent anonymously.
+The optional product-feedback nudge is shown on a successful `photoshop_ping`
+**15 minutes after the first connected ping** (not on first install / first ping),
+then at most once every 7 days until the user answers `yes` or `dont_ask`.
+The first connected ping only stamps `firstSeenAt` in `~/.photoshop-mcp/feedback-nudge.json`.
+It is skipped when analytics are disabled and when the server is spawned by the
+standalone UI (`PHOTOSHOP_MCP_SURFACE=ui`). Asking is consent: the question
+states that the answer is sent anonymously. `mcp_product_feedback` is flushed
+immediately after submit so it is not left in the 5-second analytics queue.
 
 ## Model tracking
 
@@ -141,8 +145,8 @@ the question states that the answer is sent anonymously.
 | `app_loaded` | Browser UI ready | `has_auth` |
 
 MCP-only installs appear in Rybbit as pageviews on `/mcp`, even when the
-standalone UI is never opened. UI server events use pathname `/ui-server`;
-the browser UI uses `/ui`.
+standalone UI is never opened. Product-feedback answers land on `/feedback`.
+UI server events use pathname `/ui-server`; the browser UI uses `/ui`.
 
 ## What we do **not** collect (unless you opt into beta team sharing)
 
@@ -216,7 +220,7 @@ Browser events also send `browser_locale_region` as a secondary hint.
 
 ## Rybbit dashboard recipes (maintainers)
 
-Filter marketing-site traffic by pathname **not** in `/mcp`, `/ui`, `/ui-server`.
+Filter marketing-site traffic by pathname **not** in `/mcp`, `/feedback`, `/ui`, `/ui-server`.
 
 | Insight | Rybbit approach |
 | --- | --- |
@@ -230,7 +234,8 @@ Filter marketing-site traffic by pathname **not** in `/mcp`, `/ui`, `/ui-server`
 | Session duration | Average `duration_ms` on `mcp_session_ended` (`idle_timeout`) or `ui_server_ended` |
 | MCP vs UI usage | User trait `usage_surfaces` (comma-separated: `mcp`, `server`, `web`) |
 | Standalone UI model | User `active_provider` / `active_model` or event `ui_model_selected` |
-| Marketing site traffic | Pageviews excluding `/mcp`, `/ui`, `/ui-server` |
+| MCP product feedback | `mcp_product_feedback` on pathname `/feedback`; `page_title` is the answer text |
+| Marketing site traffic | Pageviews excluding `/mcp`, `/feedback`, `/ui`, `/ui-server` |
 | Install copy conversion | `site_code_copied` segmented by `command` |
 | Site CTA funnel | `site_cta_clicked` segmented by `cta_id` / `cta_location` |
 

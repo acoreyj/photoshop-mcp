@@ -63,6 +63,9 @@ async function main(): Promise<void> {
   if (!pingText.includes('Photoshop')) {
     throw new Error('ping did not mention Photoshop');
   }
+  if (pingText.includes('FEEDBACK_NUDGE')) {
+    throw new Error('first ping must not include FEEDBACK_NUDGE (15-minute delay)');
+  }
 
   const submit = await client.callTool({
     name: 'photoshop_submit_feedback',

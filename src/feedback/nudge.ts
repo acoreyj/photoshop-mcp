@@ -2,12 +2,14 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { capture } from '../analytics/index.js';
+import { flushAnalyticsClient } from '../analytics/provider.js';
 import { hasAnalyticsKey } from '../analytics/config.js';
 import { isAnalyticsEnabled } from '../analytics/identity.js';
 import { envelopeToToolResult } from '../errors/envelope.js';
 import { getPhotoshopMcpHomeDir, PHOTOSHOP_MCP_SURFACE_ENV } from '../lib/export-paths.js';
 
 export const FEEDBACK_NUDGE_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+export const FEEDBACK_NUDGE_MIN_AGE_MS = 15 * 60 * 1000;
 export const FEEDBACK_SUGGESTION_MAX_CHARS = 200;
 export const FEEDBACK_NUDGE_MARKER = 'FEEDBACK_NUDGE';
 export const PING_CONNECTED_TEXT = 'Successfully connected to Photoshop';
@@ -18,6 +20,7 @@ export type FeedbackNudgeStatus = 'shown' | 'yes' | 'dont_ask';
 
 export interface FeedbackNudgeStore {
   status?: FeedbackNudgeStatus;
+  firstSeenAt?: number;
   lastShownAt?: number;
   submittedAt?: number;
   choice?: FeedbackChoice;
@@ -57,14 +60,31 @@ export function truncateFeedbackSuggestion(value: string | undefined): string | 
   return `${trimmed.slice(0, FEEDBACK_SUGGESTION_MAX_CHARS)}${TRUNCATION_SUFFIX}`;
 }
 
+function isFiniteTimestamp(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
 export function isFeedbackNudgeDue(now = Date.now()): boolean {
   if (!isAnalyticsEnabled() || !hasAnalyticsKey()) return false;
   if (isUiMcpSurface()) return false;
 
   const store = readStore();
   if (store.status === 'dont_ask' || store.status === 'yes') return false;
-  if (typeof store.lastShownAt !== 'number' || !Number.isFinite(store.lastShownAt)) return true;
-  return now - store.lastShownAt >= FEEDBACK_NUDGE_COOLDOWN_MS;
+  if (isFiniteTimestamp(store.lastShownAt)) {
+    return now - store.lastShownAt >= FEEDBACK_NUDGE_COOLDOWN_MS;
+  }
+  if (!isFiniteTimestamp(store.firstSeenAt)) return false;
+  return now - store.firstSeenAt >= FEEDBACK_NUDGE_MIN_AGE_MS;
+}
+
+/** Stamp the first successful ping; later pings keep the original timestamp. */
+export function markFeedbackFirstSeen(now = Date.now()): void {
+  const store = readStore();
+  if (isFiniteTimestamp(store.firstSeenAt)) return;
+  writeStore({
+    ...store,
+    firstSeenAt: now,
+  });
 }
 
 export function markFeedbackNudgeShown(now = Date.now()): void {
@@ -87,6 +107,7 @@ export function recordFeedback(
 
   if (choice === 'yes') {
     writeStore({
+      ...readStore(),
       status: 'yes',
       lastShownAt: now,
       submittedAt: now,
@@ -94,6 +115,7 @@ export function recordFeedback(
     });
   } else if (choice === 'dont_ask') {
     writeStore({
+      ...readStore(),
       status: 'dont_ask',
       lastShownAt: now,
       submittedAt: now,
@@ -110,11 +132,14 @@ export function recordFeedback(
   }
 
   capture('mcp_product_feedback', {
+    $pathname: '/feedback',
+    $page_title: truncated ?? choice,
     feedback_choice: choice,
     has_suggestion: hasSuggestion,
     ...(truncated ? { suggestion: truncated } : {}),
     event_source: 'mcp',
   });
+  void flushAnalyticsClient().catch(() => {});
 
   return { recorded: true, choice, has_suggestion: hasSuggestion };
 }
@@ -147,9 +172,12 @@ export function buildPingToolResult(connected: boolean, now = Date.now()): CallT
     },
   ];
 
-  if (connected && isFeedbackNudgeDue(now)) {
-    markFeedbackNudgeShown(now);
-    content.push({ type: 'text', text: buildFeedbackNudgeBlock() });
+  if (connected) {
+    markFeedbackFirstSeen(now);
+    if (isFeedbackNudgeDue(now)) {
+      markFeedbackNudgeShown(now);
+      content.push({ type: 'text', text: buildFeedbackNudgeBlock() });
+    }
   }
 
   return { content };

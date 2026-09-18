@@ -11,16 +11,27 @@ vi.mock('../src/analytics/index.js', async (importOriginal) => {
   };
 });
 
+vi.mock('../src/analytics/provider.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/analytics/provider.js')>();
+  return {
+    ...actual,
+    flushAnalyticsClient: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
 import { capture } from '../src/analytics/index.js';
+import { flushAnalyticsClient } from '../src/analytics/provider.js';
 import { sanitizeAnalyticsProperties } from '../src/analytics/events.js';
 import {
   FEEDBACK_NUDGE_COOLDOWN_MS,
   FEEDBACK_NUDGE_MARKER,
+  FEEDBACK_NUDGE_MIN_AGE_MS,
   FEEDBACK_SUGGESTION_MAX_CHARS,
   PING_CONNECTED_TEXT,
   PING_FAILED_TEXT,
   buildPingToolResult,
   isFeedbackNudgeDue,
+  markFeedbackFirstSeen,
   markFeedbackNudgeShown,
   recordFeedback,
   submitFeedbackFromArgs,
@@ -31,6 +42,18 @@ function textBlocks(result: { content: Array<{ type: string; text?: string }> })
   return result.content
     .filter((block) => block.type === 'text' && typeof block.text === 'string')
     .map((block) => block.text as string);
+}
+
+function readNudgeStore(home: string): {
+  firstSeenAt?: number;
+  lastShownAt?: number;
+  status?: string;
+} {
+  return JSON.parse(readFileSync(join(home, 'feedback-nudge.json'), 'utf8')) as {
+    firstSeenAt?: number;
+    lastShownAt?: number;
+    status?: string;
+  };
 }
 
 describe('MCP feedback nudge', () => {
@@ -51,6 +74,7 @@ describe('MCP feedback nudge', () => {
     delete process.env.POSTHOG_DISABLED;
     delete process.env[PHOTOSHOP_MCP_SURFACE_ENV];
     vi.mocked(capture).mockClear();
+    vi.mocked(flushAnalyticsClient).mockClear();
   });
 
   afterEach(() => {
@@ -65,23 +89,67 @@ describe('MCP feedback nudge', () => {
     rmSync(home, { recursive: true, force: true });
   });
 
-  it('is due on a fresh install', () => {
-    expect(isFeedbackNudgeDue(1_000_000)).toBe(true);
+  it('is not due on a fresh install', () => {
+    expect(isFeedbackNudgeDue(1_000_000)).toBe(false);
+  });
+
+  it('stamps firstSeenAt on the first connected ping and does not nudge', () => {
+    const now = 1_000_000;
+    const result = buildPingToolResult(true, now);
+    expect(textBlocks(result)).toEqual([PING_CONNECTED_TEXT]);
+    const stored = readNudgeStore(home);
+    expect(stored.firstSeenAt).toBe(now);
+    expect(stored.lastShownAt).toBeUndefined();
+    expect(isFeedbackNudgeDue(now)).toBe(false);
+    expect(isFeedbackNudgeDue(now + FEEDBACK_NUDGE_MIN_AGE_MS - 1)).toBe(false);
+  });
+
+  it('appends FEEDBACK_NUDGE 15 minutes after the first connected ping', () => {
+    const firstSeenAt = 1_000_000;
+    buildPingToolResult(true, firstSeenAt);
+    const dueAt = firstSeenAt + FEEDBACK_NUDGE_MIN_AGE_MS;
+    const result = buildPingToolResult(true, dueAt);
+    const texts = textBlocks(result);
+    expect(texts[0]).toBe(PING_CONNECTED_TEXT);
+    expect(texts[1]).toContain(FEEDBACK_NUDGE_MARKER);
+    expect(texts[1]).toContain('photoshop_submit_feedback');
+    expect(readNudgeStore(home).lastShownAt).toBe(dueAt);
+  });
+
+  it('does not start the 15-minute clock on a failed ping', () => {
+    const result = buildPingToolResult(false, 1_000_000);
+    expect(textBlocks(result)).toEqual([PING_FAILED_TEXT]);
+    expect(existsSync(join(home, 'feedback-nudge.json'))).toBe(false);
+    expect(isFeedbackNudgeDue(1_000_000)).toBe(false);
+    expect(isFeedbackNudgeDue(1_000_000 + FEEDBACK_NUDGE_MIN_AGE_MS)).toBe(false);
   });
 
   it('starts a 7-day cooldown when the ping nudge is shown', () => {
-    const now = 1_000_000;
-    markFeedbackNudgeShown(now);
-    expect(isFeedbackNudgeDue(now)).toBe(false);
-    expect(isFeedbackNudgeDue(now + FEEDBACK_NUDGE_COOLDOWN_MS - 1)).toBe(false);
-    expect(isFeedbackNudgeDue(now + FEEDBACK_NUDGE_COOLDOWN_MS)).toBe(true);
+    const firstSeenAt = 1_000_000;
+    markFeedbackFirstSeen(firstSeenAt);
+    const shownAt = firstSeenAt + FEEDBACK_NUDGE_MIN_AGE_MS;
+    markFeedbackNudgeShown(shownAt);
+    expect(isFeedbackNudgeDue(shownAt)).toBe(false);
+    expect(isFeedbackNudgeDue(shownAt + FEEDBACK_NUDGE_COOLDOWN_MS - 1)).toBe(false);
+    expect(isFeedbackNudgeDue(shownAt + FEEDBACK_NUDGE_COOLDOWN_MS)).toBe(true);
+  });
+
+  it('keeps the 7-day cooldown when lastShownAt exists without firstSeenAt', () => {
+    const lastShownAt = 1_000_000;
+    markFeedbackNudgeShown(lastShownAt);
+    expect(isFeedbackNudgeDue(lastShownAt)).toBe(false);
+    expect(isFeedbackNudgeDue(lastShownAt + FEEDBACK_NUDGE_COOLDOWN_MS - 1)).toBe(false);
+    expect(isFeedbackNudgeDue(lastShownAt + FEEDBACK_NUDGE_COOLDOWN_MS)).toBe(true);
   });
 
   it('does not ask again after yes', () => {
     const now = 1_000_000;
-    markFeedbackNudgeShown(now);
+    markFeedbackFirstSeen(now);
+    markFeedbackNudgeShown(now + FEEDBACK_NUDGE_MIN_AGE_MS);
     recordFeedback('yes', 'batch rename layers');
-    expect(isFeedbackNudgeDue(now + FEEDBACK_NUDGE_COOLDOWN_MS * 4)).toBe(false);
+    expect(
+      isFeedbackNudgeDue(now + FEEDBACK_NUDGE_MIN_AGE_MS + FEEDBACK_NUDGE_COOLDOWN_MS * 4)
+    ).toBe(false);
   });
 
   it('does not ask again after dont_ask', () => {
@@ -90,43 +158,33 @@ describe('MCP feedback nudge', () => {
   });
 
   it('asks again 7 days after not_now', () => {
+    markFeedbackFirstSeen(1_000_000);
     recordFeedback('not_now');
-    const stored = JSON.parse(readFileSync(join(home, 'feedback-nudge.json'), 'utf8')) as {
-      lastShownAt: number;
-    };
-    expect(isFeedbackNudgeDue(stored.lastShownAt)).toBe(false);
-    expect(isFeedbackNudgeDue(stored.lastShownAt + FEEDBACK_NUDGE_COOLDOWN_MS)).toBe(true);
+    const stored = readNudgeStore(home);
+    expect(stored.firstSeenAt).toBe(1_000_000);
+    expect(isFeedbackNudgeDue(stored.lastShownAt!)).toBe(false);
+    expect(isFeedbackNudgeDue(stored.lastShownAt! + FEEDBACK_NUDGE_COOLDOWN_MS)).toBe(true);
   });
 
   it('is not due when analytics are disabled', () => {
     process.env.ANALYTICS_DISABLED = '1';
-    expect(isFeedbackNudgeDue(1_000_000)).toBe(false);
+    markFeedbackFirstSeen(1_000_000);
+    expect(isFeedbackNudgeDue(1_000_000 + FEEDBACK_NUDGE_MIN_AGE_MS)).toBe(false);
   });
 
   it('is not due on the standalone UI surface', () => {
     process.env[PHOTOSHOP_MCP_SURFACE_ENV] = 'ui';
-    expect(isFeedbackNudgeDue(1_000_000)).toBe(false);
-  });
-
-  it('keeps the ping connected prefix and appends FEEDBACK_NUDGE when due', () => {
-    const result = buildPingToolResult(true, 1_000_000);
-    const texts = textBlocks(result);
-    expect(texts[0]).toBe(PING_CONNECTED_TEXT);
-    expect(texts[1]).toContain(FEEDBACK_NUDGE_MARKER);
-    expect(texts[1]).toContain('photoshop_submit_feedback');
-    expect(existsSync(join(home, 'feedback-nudge.json'))).toBe(true);
-  });
-
-  it('does not append a nudge on a failed ping', () => {
-    const result = buildPingToolResult(false, 1_000_000);
-    expect(textBlocks(result)).toEqual([PING_FAILED_TEXT]);
-    expect(isFeedbackNudgeDue(1_000_000)).toBe(true);
+    markFeedbackFirstSeen(1_000_000);
+    expect(isFeedbackNudgeDue(1_000_000 + FEEDBACK_NUDGE_MIN_AGE_MS)).toBe(false);
   });
 
   it('does not append a second nudge in the same cooldown window', () => {
-    const first = buildPingToolResult(true, 1_000_000);
-    const second = buildPingToolResult(true, 1_000_001);
-    expect(textBlocks(first)).toHaveLength(2);
+    const firstSeenAt = 1_000_000;
+    const dueAt = firstSeenAt + FEEDBACK_NUDGE_MIN_AGE_MS;
+    expect(textBlocks(buildPingToolResult(true, firstSeenAt))).toEqual([PING_CONNECTED_TEXT]);
+    const firstDue = buildPingToolResult(true, dueAt);
+    const second = buildPingToolResult(true, dueAt + 1);
+    expect(textBlocks(firstDue)).toHaveLength(2);
     expect(textBlocks(second)).toEqual([PING_CONNECTED_TEXT]);
   });
 
@@ -136,11 +194,32 @@ describe('MCP feedback nudge', () => {
     expect(capture).toHaveBeenCalledWith(
       'mcp_product_feedback',
       expect.objectContaining({
+        $pathname: '/feedback',
+        $page_title: `${'x'.repeat(FEEDBACK_SUGGESTION_MAX_CHARS)}…[truncated]`,
         feedback_choice: 'yes',
         has_suggestion: true,
         suggestion: `${'x'.repeat(FEEDBACK_SUGGESTION_MAX_CHARS)}…[truncated]`,
         event_source: 'mcp',
       })
+    );
+    expect(flushAnalyticsClient).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the choice as page title when there is no suggestion', () => {
+    recordFeedback('not_now');
+    expect(capture).toHaveBeenCalledWith(
+      'mcp_product_feedback',
+      expect.objectContaining({
+        $pathname: '/feedback',
+        $page_title: 'not_now',
+        feedback_choice: 'not_now',
+        has_suggestion: false,
+        event_source: 'mcp',
+      })
+    );
+    expect(capture).toHaveBeenCalledWith(
+      'mcp_product_feedback',
+      expect.not.objectContaining({ suggestion: expect.anything() })
     );
   });
 
@@ -148,6 +227,7 @@ describe('MCP feedback nudge', () => {
     const result = submitFeedbackFromArgs({ choice: 'maybe' });
     expect(result.isError).toBe(true);
     expect(textBlocks(result).join('')).toContain('invalid_arguments');
+    expect(flushAnalyticsClient).not.toHaveBeenCalled();
   });
 
   it('tells the agent to continue after a valid submit', () => {
@@ -162,6 +242,7 @@ describe('MCP feedback nudge', () => {
     };
     expect(payload.ok).toBe(true);
     expect(payload.next).toMatch(/original Photoshop request/i);
+    expect(flushAnalyticsClient).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -169,6 +250,8 @@ describe('feedback analytics allowlist', () => {
   it('keeps suggestion and drops blocked prompt text', () => {
     expect(
       sanitizeAnalyticsProperties({
+        $pathname: '/feedback',
+        $page_title: 'batch rename layers',
         feedback_choice: 'yes',
         has_suggestion: true,
         suggestion: 'batch rename layers',
@@ -176,6 +259,8 @@ describe('feedback analytics allowlist', () => {
         event_source: 'mcp',
       })
     ).toEqual({
+      $pathname: '/feedback',
+      $page_title: 'batch rename layers',
       feedback_choice: 'yes',
       has_suggestion: true,
       suggestion: 'batch rename layers',

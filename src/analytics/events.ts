@@ -92,7 +92,12 @@ const ALLOWED_PROPERTY_KEYS = new Set([
   'suggestion',
 ]);
 
-const ANALYTICS_RESERVED_PROPERTY_KEYS = new Set(['$current_url', '$pathname', '$screen_name']);
+const ANALYTICS_RESERVED_PROPERTY_KEYS = new Set([
+  '$current_url',
+  '$pathname',
+  '$page_title',
+  '$screen_name',
+]);
 
 const ARRAY_PROPERTY_KEYS = new Set(['tools_used', 'error_codes']);
 
