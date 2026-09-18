@@ -5,6 +5,17 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.17] - 2026-09-18
+
+[v1.7.16...v1.7.17](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.16...v1.7.17)
+
+### Other
+
+- Delay the MCP feedback nudge until 15 minutes after the first ping. (`e1def0e`)
+- Ask first-time MCP users for product feedback after ping. (`680860e`)
+- Restore the v1.1+ blurb in the Turkish README. (`dc43180`)
+- Remove the outdated v1.1+ blurb from the Turkish README. (`0c63252`)
+
 ## [1.7.16] - 2026-09-18
 
 [v1.7.15...v1.7.16](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.15...v1.7.16)
@@ -13,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Treat Cursor stdio respawns as one analytics session and cache Photoshop detection. (`fc4734c`)
 - Show GitHub contributors in the README so credit is visible. (`437efc3`)
+
+### Version bumps
+
+- 1.7.16 (`e336fde`)
 
 ## [1.7.15] - 2026-09-16
 
