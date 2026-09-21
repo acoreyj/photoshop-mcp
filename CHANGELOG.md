@@ -7,12 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.18] - 2026-09-21
+
+[v1.7.17...v1.7.18](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.17...v1.7.18)
+
+Shaped by anonymous product feedback. Rybbit assigns generated session nicknames (not real names or accounts) — thank you **Coral Hamster** and **Scarlet Turtle**.
+
 ### Added
 
-- Artboard tools: `photoshop_list_artboards`, `photoshop_create_artboard`, `photoshop_set_active_artboard`, `photoshop_export_artboards`. `photoshop_get_state` includes artboard bounds; `photoshop_export_as` accepts `artboard_id`.
-- `timeout_ms` on `photoshop_execute_script` (max 600s) and env `PHOTOSHOP_SCRIPT_TIMEOUT`. Batch recipes and multi-file exports use a 600s script budget.
+- Artboard tools: `photoshop_list_artboards`, `photoshop_create_artboard`, `photoshop_set_active_artboard`, `photoshop_export_artboards`. `photoshop_get_state` includes artboard bounds; `photoshop_export_as` accepts `artboard_id`. Thanks **Coral Hamster** for asking for artboard / multi-screen workflows.
+- `timeout_ms` on `photoshop_execute_script` (max 600s) and env `PHOTOSHOP_SCRIPT_TIMEOUT`. Batch recipes and multi-file exports use a 600s script budget. Thanks **Coral Hamster** for reporting long scripts timing out.
 - `photoshop_list_documents` reports `artboard_count` and `saved` per open tab; `photoshop_get_state` includes `openDocumentCount`.
-- Typography: `photoshop_set_text_style` (tracking, leading, paragraph box, alignment) and `photoshop_set_text_ranges` (mixed font/color in one layer). `photoshop_create_text_layer` accepts the same style fields.
+- Typography: `photoshop_set_text_style` (tracking, leading, paragraph box, alignment) and `photoshop_set_text_ranges` (mixed font/color in one layer). `photoshop_create_text_layer` accepts the same style fields. Thanks **Scarlet Turtle** for the tracking / leading / mixed-range / text-box request.
+
+### Changed
+
+- Product-feedback ping is on by default but opt-out (`PSMCP_FEEDBACK=0`, or MCPB **Product feedback prompts**). Hosts ask in the user's conversation language, in first person.
 
 ### Fixed
 
