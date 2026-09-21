@@ -119,6 +119,7 @@ the server. Requests without a valid token get `401 unauthorized`.
 - `PHOTOSHOP_SCRIPT_TIMEOUT`: Default ExtendScript timeout in milliseconds (default `30000`, max `600000`)
 - `LOG_LEVEL`: Logging level (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR)
 - `PSMCP_UI_TOKEN`: Pin the standalone UI session token (see above)
+- `PSMCP_FEEDBACK`: Set `0` / `false` / `no` to disable the product-feedback ping question (on by default)
 - `ANALYTICS_DISABLED`: Set to `1` or `true` to disable anonymous usage analytics entirely
 - `POSTHOG_DISABLED`: Legacy alias for `ANALYTICS_DISABLED`
 - `RYBBIT_API_KEY`: (Optional) Rybbit ingest API key — skips bot detection for server events

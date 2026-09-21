@@ -35,7 +35,8 @@
       ],
       "env": {
         "LOG_LEVEL": "${user_config.logLevel}",
-        "PHOTOSHOP_PATH": "${user_config.photoshopPath}"
+        "PHOTOSHOP_PATH": "${user_config.photoshopPath}",
+        "PSMCP_FEEDBACK": "${user_config.enableFeedback}"
       }
     }
   },
@@ -56,6 +57,13 @@
       "type": "string",
       "title": "Photoshop install path",
       "description": "Optional. Leave empty to auto-detect the local Photoshop install.",
+      "required": false
+    },
+    "enableFeedback": {
+      "type": "boolean",
+      "title": "Product feedback prompts",
+      "description": "After ping, the assistant may ask for a problem or feature idea. On by default. Turn off to skip the question.",
+      "default": true,
       "required": false
     }
   },

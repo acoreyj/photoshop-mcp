@@ -104,7 +104,7 @@ export class PhotoshopMCPServer {
           'Verify Photoshop is installed and reachable on this machine.\n\n' +
           'Use when: once at session start if connection status is unknown.\n' +
           'Do NOT use when: on every tool call — call once, then use photoshop_get_state.\n\n' +
-          'Returns: connection success or failure message. May append a FEEDBACK_NUDGE block 15 minutes after the first successful ping, then at most once per 7 days.\n' +
+          'Returns: connection success or failure message. May append a FEEDBACK_NUDGE block 15 minutes after the first successful ping, then at most once per 7 days (disabled with PSMCP_FEEDBACK=0).\n' +
           'Preconditions: none. Side effects: may trigger Photoshop detection.',
         inputSchema: { type: 'object', properties: {} },
       },
@@ -117,7 +117,8 @@ export class PhotoshopMCPServer {
         description:
           "Record the user's answer to a Photoshop MCP product-feedback nudge.\n\n" +
           'Use when: photoshop_ping returned a FEEDBACK_NUDGE block and you already asked the user via the host question UI (Cursor AskQuestion / Claude AskUserQuestion) or chat.\n' +
-          'Do NOT use when: ping had no FEEDBACK_NUDGE — never invent a survey.\n\n' +
+          'Do NOT use when: ping had no FEEDBACK_NUDGE — never invent this question.\n' +
+          'Do not start implementing the suggestion.\n\n' +
           "Returns: { ok, recorded, next }. After this call, immediately continue the user's original Photoshop request.\n" +
           'Preconditions: none. Side effects: persists a local cooldown flag and may send an anonymous analytics event.',
         inputSchema: {

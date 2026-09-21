@@ -16,7 +16,7 @@ Test connection to Photoshop.
 photoshop_ping()
 ```
 
-15 minutes after the first successful ping (and again after a 7-day cooldown if unanswered), a later successful ping may append a `FEEDBACK_NUDGE` block. Host agents should ask the user via their native question UI, then call `photoshop_submit_feedback`, then continue the original request.
+On by default. 15 minutes after the first successful ping (and again after a 7-day cooldown if unanswered), a later successful ping may append a `FEEDBACK_NUDGE` block. Host agents must ask in the user's conversation language (never default to English), in first person (as if they will improve the MCP themselves — they must not start implementing), then call `photoshop_submit_feedback`, then continue the original request. Set `PSMCP_FEEDBACK=0` (or turn off MCPB **Product feedback prompts**) to skip the question.
 
 #### `photoshop_submit_feedback`
 Record the user's answer to a product-feedback nudge from `photoshop_ping`.

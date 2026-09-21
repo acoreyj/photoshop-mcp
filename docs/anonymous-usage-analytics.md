@@ -49,6 +49,7 @@ Rybbit custom-event properties are capped at **2KB**. Long fields such as
 | --- | --- | --- |
 | `ANALYTICS_DISABLED` | off | Set `1` or `true` to disable all analytics for that process |
 | `POSTHOG_DISABLED` | — | Legacy alias for `ANALYTICS_DISABLED` |
+| `PSMCP_FEEDBACK` | on | Set `0` / `false` / `no` to disable the product-feedback ping question |
 | `RYBBIT_API_KEY` | unset | Optional Bearer token with `ingest:write` — skips bot detection on server events |
 | `RYBBIT_HOST` | `https://hey.sideguard.io` | Self-hosted Rybbit origin (forks/staging) |
 | `RYBBIT_SITE_ID` | embedded in `config.ts` | Rybbit site ID |
@@ -113,14 +114,18 @@ when the session ends or the MCP client disconnects.
 One-time funnel milestones (`mcp_first_tool_success`, `mcp_photoshop_first_connected`)
 use a persisted local flag only.
 
-The optional product-feedback nudge is shown on a successful `photoshop_ping`
-**15 minutes after the first connected ping** (not on first install / first ping),
-then at most once every 7 days until the user answers `yes` or `dont_ask`.
-The first connected ping only stamps `firstSeenAt` in `~/.photoshop-mcp/feedback-nudge.json`.
-It is skipped when analytics are disabled and when the server is spawned by the
-standalone UI (`PHOTOSHOP_MCP_SURFACE=ui`). Asking is consent: the question
-states that the answer is sent anonymously. `mcp_product_feedback` is flushed
-immediately after submit so it is not left in the 5-second analytics queue.
+The product-feedback question is **on by default**. It is shown on a successful
+`photoshop_ping` **15 minutes after the first connected ping** (not on first
+install / first ping), then at most once every 7 days until the user answers
+`yes` or `dont_ask`. The first connected ping only stamps `firstSeenAt` in
+`~/.photoshop-mcp/feedback-nudge.json`.
+It is skipped when `PSMCP_FEEDBACK=0` (or MCPB **Product feedback prompts** is
+off), when analytics are disabled, and when the server is spawned by the
+standalone UI (`PHOTOSHOP_MCP_SURFACE=ui`). The host agent asks in the user's
+conversation language, in first person;
+the user-facing question does not mention a team or anonymous sending.
+`mcp_product_feedback` is still flushed immediately after submit so it is not
+left in the 5-second analytics queue.
 
 ## Model tracking
 
@@ -152,9 +157,10 @@ UI server events use pathname `/ui-server`; the browser UI uses `/ui`.
 
 - API keys or OAuth tokens
 - Chat messages, prompts, or model responses **by default** (the optional MCP
-  product-feedback nudge is the exception: if you answer Q1, `choice` and an
-  optional truncated `suggestion` are sent as `mcp_product_feedback`; the nudge
-  is not shown when analytics are off)
+  product-feedback question is the exception: if they answer with a problem or
+  feature, `choice` and an optional truncated `suggestion` are sent as
+  `mcp_product_feedback`; the question is skipped when analytics are off or
+  `PSMCP_FEEDBACK=0`)
 - Photoshop document or layer names, file paths, or image content
 - CLI account labels, email addresses, or other account identifiers
 - Tool call **arguments** or **results** (MCP logs tool **names** only)

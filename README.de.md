@@ -643,6 +643,7 @@ Zur Claude Desktop-Konfiguration hinzufügen (`~/Library/Application Support/Cla
 - `PHOTOSHOP_PATH`: (Optional) Benutzerdefinierten Photoshop-Installationspfad angeben
 - `PHOTOSHOP_SCRIPT_TIMEOUT`: Standard-ExtendScript-Timeout in Millisekunden (Standard `30000`, max. `600000`)
 - `LOG_LEVEL`: Protokollierungsstufe (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR)
+- `PSMCP_FEEDBACK`: `0` / `false` / `no` deaktiviert die Produkt-Feedback-Ping-Frage (standardmäßig an)
 - `ANALYTICS_DISABLED`: Auf `1` oder `true` setzen, um anonyme Nutzungsanalysen vollständig zu deaktivieren
 - `POSTHOG_DISABLED`: Veralteter Alias für `ANALYTICS_DISABLED`
 - `RYBBIT_API_KEY`: (Optional) Rybbit-Ingest-Schlüssel — umgeht Bot-Erkennung für Server-Events

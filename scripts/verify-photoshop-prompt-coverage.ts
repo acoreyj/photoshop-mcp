@@ -118,6 +118,7 @@ assert.ok(instructions.length > 200, 'Photoshop instructions should be substanti
 for (const marker of [
   'photoshop_ping',
   'FEEDBACK_NUDGE',
+  'Never default to English',
   'photoshop_submit_feedback',
   'photoshop_get_state',
   'photoshop_get_capabilities',

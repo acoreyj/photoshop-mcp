@@ -85,6 +85,7 @@ Examples: [examples/cursor-config.json](examples/cursor-config.json), [examples/
 | `PHOTOSHOP_PATH` | Optional custom Photoshop install path |
 | `PHOTOSHOP_SCRIPT_TIMEOUT` | Default ExtendScript timeout in ms (default `30000`, max `600000`) |
 | `PSMCP_UI_TOKEN` | Pin standalone UI API token (see README) |
+| `PSMCP_FEEDBACK` | Set `0` to disable the product-feedback ping question (on by default) |
 
 ## Troubleshooting (common agent blockers)
 

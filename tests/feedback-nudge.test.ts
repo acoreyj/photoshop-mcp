@@ -24,13 +24,18 @@ import { flushAnalyticsClient } from '../src/analytics/provider.js';
 import { sanitizeAnalyticsProperties } from '../src/analytics/events.js';
 import {
   FEEDBACK_NUDGE_COOLDOWN_MS,
+  FEEDBACK_NUDGE_ENV,
+  FEEDBACK_NUDGE_LANGUAGE_RULE,
   FEEDBACK_NUDGE_MARKER,
   FEEDBACK_NUDGE_MIN_AGE_MS,
+  FEEDBACK_NUDGE_QUESTION_EN,
+  FEEDBACK_NUDGE_QUESTION_TR,
   FEEDBACK_SUGGESTION_MAX_CHARS,
   PING_CONNECTED_TEXT,
   PING_FAILED_TEXT,
   buildPingToolResult,
   isFeedbackNudgeDue,
+  isFeedbackNudgeEnabled,
   markFeedbackFirstSeen,
   markFeedbackNudgeShown,
   recordFeedback,
@@ -62,14 +67,17 @@ describe('MCP feedback nudge', () => {
   let previousDisabled: string | undefined;
   let previousPosthog: string | undefined;
   let previousSurface: string | undefined;
+  let previousFeedback: string | undefined;
 
   beforeEach(() => {
     previousHome = process.env.PHOTOSHOP_MCP_HOME;
     previousDisabled = process.env.ANALYTICS_DISABLED;
     previousPosthog = process.env.POSTHOG_DISABLED;
     previousSurface = process.env[PHOTOSHOP_MCP_SURFACE_ENV];
+    previousFeedback = process.env[FEEDBACK_NUDGE_ENV];
     home = mkdtempSync(join(tmpdir(), 'ph-mcp-feedback-'));
     process.env.PHOTOSHOP_MCP_HOME = home;
+    delete process.env[FEEDBACK_NUDGE_ENV];
     delete process.env.ANALYTICS_DISABLED;
     delete process.env.POSTHOG_DISABLED;
     delete process.env[PHOTOSHOP_MCP_SURFACE_ENV];
@@ -86,7 +94,33 @@ describe('MCP feedback nudge', () => {
     else process.env.POSTHOG_DISABLED = previousPosthog;
     if (previousSurface === undefined) delete process.env[PHOTOSHOP_MCP_SURFACE_ENV];
     else process.env[PHOTOSHOP_MCP_SURFACE_ENV] = previousSurface;
+    if (previousFeedback === undefined) delete process.env[FEEDBACK_NUDGE_ENV];
+    else process.env[FEEDBACK_NUDGE_ENV] = previousFeedback;
     rmSync(home, { recursive: true, force: true });
+  });
+
+  it('is on by default when PSMCP_FEEDBACK is unset', () => {
+    delete process.env[FEEDBACK_NUDGE_ENV];
+    expect(isFeedbackNudgeEnabled()).toBe(true);
+    const firstSeenAt = 1_000_000;
+    expect(textBlocks(buildPingToolResult(true, firstSeenAt))).toEqual([PING_CONNECTED_TEXT]);
+    expect(readNudgeStore(home).firstSeenAt).toBe(firstSeenAt);
+    const due = buildPingToolResult(true, firstSeenAt + FEEDBACK_NUDGE_MIN_AGE_MS);
+    expect(textBlocks(due)[1]).toContain(FEEDBACK_NUDGE_MARKER);
+  });
+
+  it('is off when PSMCP_FEEDBACK is 0', () => {
+    process.env[FEEDBACK_NUDGE_ENV] = '0';
+    expect(isFeedbackNudgeEnabled()).toBe(false);
+    const now = 1_000_000;
+    expect(textBlocks(buildPingToolResult(true, now))).toEqual([PING_CONNECTED_TEXT]);
+    expect(existsSync(join(home, 'feedback-nudge.json'))).toBe(false);
+    expect(isFeedbackNudgeDue(now + FEEDBACK_NUDGE_MIN_AGE_MS)).toBe(false);
+  });
+
+  it('is off when PSMCP_FEEDBACK is false', () => {
+    process.env[FEEDBACK_NUDGE_ENV] = 'false';
+    expect(isFeedbackNudgeEnabled()).toBe(false);
   });
 
   it('is not due on a fresh install', () => {
@@ -113,6 +147,12 @@ describe('MCP feedback nudge', () => {
     expect(texts[0]).toBe(PING_CONNECTED_TEXT);
     expect(texts[1]).toContain(FEEDBACK_NUDGE_MARKER);
     expect(texts[1]).toContain('photoshop_submit_feedback');
+    expect(texts[1]).toContain(FEEDBACK_NUDGE_LANGUAGE_RULE);
+    expect(texts[1]).toContain('Never default to English');
+    expect(texts[1]).toContain(FEEDBACK_NUDGE_QUESTION_EN);
+    expect(texts[1]).toContain(FEEDBACK_NUDGE_QUESTION_TR);
+    expect(texts[1]).not.toMatch(/Photoshop MCP team/i);
+    expect(texts[1]).not.toMatch(/anonymously/i);
     expect(readNudgeStore(home).lastShownAt).toBe(dueAt);
   });
 
