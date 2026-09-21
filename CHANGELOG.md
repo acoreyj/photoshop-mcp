@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.19] - 2026-09-21
+
+[v1.7.18...v1.7.19](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.18...v1.7.19)
+
+### Fixed
+
+- Windows: non-ASCII text returned from Photoshop (CJK document and layer names, localized errors) is no longer mojibake. Script results are written as UTF-16 instead of being printed through `cscript` stdout. Thanks **DENGGL2** for the report in [#40](https://github.com/alisaitteke/photoshop-mcp/issues/40).
+
+### Changed
+
+- Release publish waits until the new version is visible on npm (publish-time malware scan) before refreshing release notes and publishing MCP Registry metadata.
+
 ## [1.7.18] - 2026-09-21
 
 [v1.7.17...v1.7.18](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.17...v1.7.18)
