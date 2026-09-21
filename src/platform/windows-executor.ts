@@ -13,11 +13,26 @@ import {
   isScriptTimeoutError,
   resolveScriptTimeoutMs,
 } from './script-timeout.js';
+import {
+  WINDOWS_JSX_ENV,
+  WINDOWS_RESULT_ENV,
+  buildWindowsBridgeScript,
+  readWindowsResultFile,
+} from './windows-script-bridge.js';
 
 const execAsync = promisify(exec);
 
 /** Extra grace before Node kills cscript, beyond the advertised tool timeout. */
 const KILL_GRACE_MS = 5000;
+
+function isExecTimeout(error: unknown): boolean {
+  if (typeof error === 'object' && error !== null) {
+    const execError = error as { killed?: boolean; signal?: NodeJS.Signals | null };
+    if (execError.killed || execError.signal) return true;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  return isScriptTimeoutError(message) || /killed/i.test(message);
+}
 
 interface QueuedScript {
   cancelled: boolean;
@@ -105,63 +120,50 @@ export class WindowsExecutor implements ScriptExecutor {
     script: string,
     timeout: number = DEFAULT_SCRIPT_TIMEOUT_MS
   ): Promise<unknown> {
-    const tempScriptPath = join(tmpdir(), `photoshop-script-${Date.now()}.jsx`);
+    const stamp = `${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const tempScriptPath = join(tmpdir(), `photoshop-script-${stamp}.jsx`);
+    const vbsPath = join(tmpdir(), `photoshop-vbs-${stamp}.vbs`);
+    const resultPath = join(tmpdir(), `photoshop-result-${stamp}.txt`);
 
     try {
       await writeFile(tempScriptPath, prefixExtendScriptBom(script), 'utf8');
-
-      const vbsScript = this.createVBSWrapper(tempScriptPath);
-      const vbsPath = join(tmpdir(), `photoshop-vbs-${Date.now()}.vbs`);
-
-      await writeFile(vbsPath, vbsScript, 'utf8');
+      await writeFile(vbsPath, buildWindowsBridgeScript(), 'utf8');
 
       try {
-        const { stdout, stderr } = await execAsync(`cscript //nologo "${vbsPath}"`, {
+        const { stderr } = await execAsync(`cscript //nologo "${vbsPath}"`, {
           timeout: timeout + KILL_GRACE_MS,
           killSignal: 'SIGKILL',
+          env: {
+            ...process.env,
+            [WINDOWS_JSX_ENV]: tempScriptPath,
+            [WINDOWS_RESULT_ENV]: resultPath,
+          },
         });
 
         if (stderr) {
           this.logger.warn('Script execution warning:', stderr);
         }
-
-        return this.parseResult(stdout);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (isScriptTimeoutError(message) || /killed/i.test(message)) {
+        if (isExecTimeout(error)) {
           throw new Error('Script execution timeout');
         }
+        const fromFile = await readWindowsResultFile(resultPath);
+        if (fromFile !== null) {
+          return this.parseResult(fromFile);
+        }
         throw error;
-      } finally {
-        await unlink(vbsPath).catch(() => {});
       }
+
+      const fromFile = await readWindowsResultFile(resultPath);
+      if (fromFile === null) {
+        throw new Error('Photoshop script produced no result');
+      }
+      return this.parseResult(fromFile);
     } finally {
+      await unlink(vbsPath).catch(() => {});
       await unlink(tempScriptPath).catch(() => {});
+      await unlink(resultPath).catch(() => {});
     }
-  }
-
-  private createVBSWrapper(jsxPath: string): string {
-    return `
-On Error Resume Next
-Dim photoshopApp
-Set photoshopApp = CreateObject("Photoshop.Application")
-
-If Err.Number <> 0 Then
-    WScript.Echo "ERROR: Failed to connect to Photoshop - " & Err.Description
-    WScript.Quit 1
-End If
-
-' Execute the JSX script
-Dim result
-result = photoshopApp.DoJavaScript("$.evalFile('" & Replace("${jsxPath}", "\\", "\\\\") & "')")
-
-If Err.Number <> 0 Then
-    WScript.Echo "ERROR: " & Err.Description
-    WScript.Quit 1
-Else
-    WScript.Echo result
-End If
-`.trim();
   }
 
   private parseResult(output: string): unknown {
