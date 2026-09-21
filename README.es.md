@@ -596,6 +596,7 @@ Añada a su configuración de Claude Desktop (`~/Library/Application Support/Cla
 ### Variables de entorno
 
 - `PHOTOSHOP_PATH`: (Opcional) Especifique una ruta de instalación de Photoshop personalizada
+- `PHOTOSHOP_SCRIPT_TIMEOUT`: Timeout ExtendScript por defecto en milisegundos (por defecto `30000`, máx. `600000`)
 - `LOG_LEVEL`: Nivel de registro (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR)
 - `ANALYTICS_DISABLED`: Establezca en `1` o `true` para deshabilitar completamente el análisis de uso anónimo
 - `POSTHOG_DISABLED`: Alias heredado de `ANALYTICS_DISABLED`

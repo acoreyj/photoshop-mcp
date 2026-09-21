@@ -25,9 +25,19 @@ Common issues when connecting to or scripting Photoshop through the MCP server.
 
 ### "Script execution timeout"
 
-- Some operations may take longer on large documents
-- The default timeout is 30 seconds
-- For complex operations, consider breaking them into smaller steps
+- Default budget is 30 seconds (`extendscript_timeout`)
+- Pass `timeout_ms` on `photoshop_execute_script` (max 600000)
+- Or set env `PHOTOSHOP_SCRIPT_TIMEOUT` (milliseconds) as the new default
+- Batch recipes (watermark, CSV cards, mockup replace, social variants, datasets, image stack, carousel split, artboard export) already use 600s
+- Generative tools use 120s
+- MCP abort does **not** stop JSX already running in Photoshop. After a timeout, ping until it succeeds before firing more tools — immediately retrying `get_state` just waits another 30s on a busy app.
+
+```javascript
+photoshop_execute_script({
+  code: "/* long loop */ return { ok: true };",
+  timeout_ms: 180000
+})
+```
 
 ### `photoshop_execute_script` returns `Result: undefined`
 

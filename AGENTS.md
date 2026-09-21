@@ -15,7 +15,7 @@
 
 **Prerequisites:** Photoshop running on Windows or macOS, Node.js 18+. This is unofficial and not affiliated with Adobe.
 
-**Tool surface:** 116 MCP tools — 100 atomic `photoshop_*` + 16 recipe `photoshop_recipe_*`; 23 MCP prompt templates (`ps.*`).
+**Tool surface:** 122 MCP tools — 106 atomic `photoshop_*` + 16 recipe `photoshop_recipe_*`; 23 MCP prompt templates (`ps.*`).
 
 ## Architecture (agent view)
 
@@ -54,6 +54,8 @@ Follow the server `instructions` advertised on MCP `initialize` ([src/prompts/in
 | Generative AI (Fill, Remove, Expand) | `photoshop_generative_*` — requires Adobe account + credits |
 | Neural Filters (skin smooth, colorize, …) | `photoshop_neural_filter` — requires UXP bridge loaded |
 | Version / feature check | `photoshop_get_capabilities` |
+| Tracking, leading, paragraph box | `photoshop_set_text_style` (or those fields on `photoshop_create_text_layer`) |
+| Mixed fonts/colors in one text layer | `photoshop_set_text_ranges` |
 
 Full catalog: [docs/available-tools.md](docs/available-tools.md). Prompt layer: [docs/prompt-layer.md](docs/prompt-layer.md).
 
@@ -81,6 +83,7 @@ Examples: [examples/cursor-config.json](examples/cursor-config.json), [examples/
 | -------- | ------- |
 | `LOG_LEVEL` | `0`=DEBUG, `1`=INFO, `2`=WARN, `3`=ERROR |
 | `PHOTOSHOP_PATH` | Optional custom Photoshop install path |
+| `PHOTOSHOP_SCRIPT_TIMEOUT` | Default ExtendScript timeout in ms (default `30000`, max `600000`) |
 | `PSMCP_UI_TOKEN` | Pin standalone UI API token (see README) |
 
 ## Troubleshooting (common agent blockers)
@@ -88,7 +91,7 @@ Examples: [examples/cursor-config.json](examples/cursor-config.json), [examples/
 | Symptom | Fix |
 | ------- | --- |
 | Photoshop not found | Start Photoshop; set `PHOTOSHOP_PATH` if non-standard install |
-| Tool times out | Large operations may need retries; check `get_state` for partial progress |
+| Tool times out | Ping until Photoshop answers, then retry. Pass `timeout_ms` on `photoshop_execute_script` (max 600s), or set `PHOTOSHOP_SCRIPT_TIMEOUT`; batch recipes already use 600s. Do not immediately retry `get_state` after a timeout — Photoshop may still be running the previous script. |
 | `generative_unavailable` / `version_unsupported` | Call `get_capabilities`; feature may need newer Photoshop or Adobe login |
 | Neural filter fails | **Add Plugin** → `uxp-plugin/manifest.json` → **Load** in UXP Developer Tools — see [docs/development.md](docs/development.md#uxp-bridge-plugin-neural-filters) |
 | No active document | Ask user to open/create a document, then `get_state` |

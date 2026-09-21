@@ -593,6 +593,7 @@ npx @alisaitteke/photoshop-mcp
 ### 环境变量
 
 - `PHOTOSHOP_PATH`：（可选）指定自定义 Photoshop 安装路径
+- `PHOTOSHOP_SCRIPT_TIMEOUT`：ExtendScript 默认超时（毫秒，默认 `30000`，最大 `600000`）
 - `LOG_LEVEL`：日志级别（0=DEBUG，1=INFO，2=WARN，3=ERROR）
 - `ANALYTICS_DISABLED`：设置为 `1` 或 `true` 可完全禁用匿名使用分析
 - `POSTHOG_DISABLED`：`ANALYTICS_DISABLED` 的旧版别名

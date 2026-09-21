@@ -5,6 +5,20 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Artboard tools: `photoshop_list_artboards`, `photoshop_create_artboard`, `photoshop_set_active_artboard`, `photoshop_export_artboards`. `photoshop_get_state` includes artboard bounds; `photoshop_export_as` accepts `artboard_id`.
+- `timeout_ms` on `photoshop_execute_script` (max 600s) and env `PHOTOSHOP_SCRIPT_TIMEOUT`. Batch recipes and multi-file exports use a 600s script budget.
+- `photoshop_list_documents` reports `artboard_count` and `saved` per open tab; `photoshop_get_state` includes `openDocumentCount`.
+- Typography: `photoshop_set_text_style` (tracking, leading, paragraph box, alignment) and `photoshop_set_text_ranges` (mixed font/color in one layer). `photoshop_create_text_layer` accepts the same style fields.
+
+### Fixed
+
+- Windows script-queue timeout now starts at dequeue (same two-phase model as macOS) and kills hung `cscript` processes.
+- Script timeouts classify as `extendscript_timeout` instead of `unknown` / `generative_timeout`. After a timeout, the envelope points at `photoshop_ping` (Photoshop may still be running the previous JSX). `photoshop_execute_script` timeouts suggest retrying once with `timeout_ms: 180000`.
+
 ## [1.7.17] - 2026-09-18
 
 [v1.7.16...v1.7.17](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.16...v1.7.17)

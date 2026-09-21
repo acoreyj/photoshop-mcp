@@ -1,6 +1,7 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { recordMcpToolCall } from '../analytics/mcp-session.js';
 import type { ToolHandler } from '../core/tool-registry.js';
+import { EXECUTE_SCRIPT_RETRY_TIMEOUT_MS } from '../platform/script-timeout.js';
 
 export type PhotoshopErrorCode =
   | 'no_active_document'
@@ -13,12 +14,15 @@ export type PhotoshopErrorCode =
   | 'version_unsupported'
   | 'generative_unavailable'
   | 'generative_timeout'
+  | 'extendscript_timeout'
+  | 'artboard_not_found'
   | 'generative_credits_exhausted'
   | 'generative_no_selection'
   | 'uxp_bridge_unavailable'
   | 'extendscript_runtime_error'
   | 'file_not_found'
   | 'font_not_found'
+  | 'not_text_layer'
   | 'unsupported_color_mode'
   | 'no_base_layer_below'
   | 'not_clipping'
@@ -47,11 +51,18 @@ const ERROR_PATTERNS: Array<{
   { pattern: /selection/i, code: 'selection_required', suggested_next_tool: 'photoshop_get_state' },
   { pattern: /version_unsupported|not supported.*version/i, code: 'version_unsupported', suggested_next_tool: 'photoshop_get_capabilities' },
   { pattern: /generative.*credit|quota|sign in/i, code: 'generative_credits_exhausted', suggested_next_tool: 'photoshop_get_capabilities' },
-  { pattern: /generative.*timeout|timed out/i, code: 'generative_timeout', suggested_next_tool: 'photoshop_get_preview' },
+  {
+    pattern: /script execution timeout|script timed out|waiting in the execution queue|appleevent timed out|ETIMEDOUT/i,
+    code: 'extendscript_timeout',
+    suggested_next_tool: 'photoshop_ping',
+  },
+  { pattern: /artboard_not_found|artboard not found|no artboard/i, code: 'artboard_not_found', suggested_next_tool: 'photoshop_list_artboards' },
+  { pattern: /generative.*timeout|generative.*timed out/i, code: 'generative_timeout', suggested_next_tool: 'photoshop_get_preview' },
   { pattern: /generative_no_selection|selection required for generative/i, code: 'generative_no_selection', suggested_next_tool: 'photoshop_select_rectangle' },
   { pattern: /uxp.?bridge|neural filter.*bridge/i, code: 'uxp_bridge_unavailable', suggested_next_tool: 'photoshop_get_capabilities' },
   { pattern: /generative/i, code: 'generative_unavailable', suggested_next_tool: 'photoshop_get_capabilities' },
   { pattern: /font_not_found/i, code: 'font_not_found', suggested_next_tool: 'photoshop_list_fonts' },
+  { pattern: /not a text layer/i, code: 'not_text_layer', suggested_next_tool: 'photoshop_create_text_layer' },
   { pattern: /file not found|does not exist/i, code: 'file_not_found' },
   { pattern: /color mode/i, code: 'unsupported_color_mode', suggested_next_tool: 'photoshop_get_document_info' },
 ];
@@ -74,6 +85,51 @@ export function classifyError(message: string): PhotoshopErrorEnvelope {
     message,
     suggested_next_tool: 'photoshop_get_state',
   };
+}
+
+const TIMEOUT_BUSY_HINT =
+  'The MCP wait ended; Photoshop may still be running that script. Call photoshop_ping until it succeeds before more edits.';
+
+/**
+ * Timeouts are classified without knowing which tool failed. Once the wrapper
+ * has the tool name, point the agent at ping (Photoshop is often still busy)
+ * or at a longer execute_script retry.
+ */
+export function refineTimeoutEnvelope(
+  toolName: string,
+  envelope: PhotoshopErrorEnvelope
+): PhotoshopErrorEnvelope {
+  if (envelope.code !== 'extendscript_timeout') return envelope;
+  if (toolName === 'photoshop_execute_script') {
+    return {
+      ...envelope,
+      message: `${envelope.message} ${TIMEOUT_BUSY_HINT} Retry once with timeout_ms.`,
+      suggested_next_tool: 'photoshop_execute_script',
+      suggested_args: { timeout_ms: EXECUTE_SCRIPT_RETRY_TIMEOUT_MS },
+    };
+  }
+  return {
+    ...envelope,
+    message: `${envelope.message} ${TIMEOUT_BUSY_HINT}`,
+    suggested_next_tool: 'photoshop_ping',
+  };
+}
+
+function refineTimeoutToolResult(toolName: string, result: CallToolResult): CallToolResult {
+  const text = result.content
+    .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
+    .map((c) => c.text)
+    .join('\n');
+  if (!text) return result;
+  try {
+    const parsed = JSON.parse(text) as PhotoshopErrorEnvelope;
+    if (parsed.ok === false && parsed.code === 'extendscript_timeout') {
+      return envelopeToToolResult(refineTimeoutEnvelope(toolName, parsed));
+    }
+  } catch {
+    // not JSON
+  }
+  return result;
 }
 
 export function envelopeToToolResult(envelope: PhotoshopErrorEnvelope): CallToolResult {
@@ -135,7 +191,7 @@ export function wrapToolHandler(toolName: string, handler: ToolHandler): ToolHan
     try {
       let result = await handler(args);
       if (result.isError) {
-        result = enrichErrorResult(result);
+        result = refineTimeoutToolResult(toolName, enrichErrorResult(result));
       }
 
       const ok = !result.isError;
@@ -148,7 +204,7 @@ export function wrapToolHandler(toolName: string, handler: ToolHandler): ToolHan
 
       return result;
     } catch (error) {
-      const result = buildEnvelopeFromError(error);
+      const result = refineTimeoutToolResult(toolName, buildEnvelopeFromError(error));
       recordMcpToolCall({
         toolName,
         ok: false,

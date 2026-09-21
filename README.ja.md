@@ -598,6 +598,7 @@ Claude Desktopの設定に追加してください（macOSは`~/Library/Applicat
 ### 環境変数
 
 - `PHOTOSHOP_PATH`：（オプション）Photoshopのカスタムインストールパスを指定
+- `PHOTOSHOP_SCRIPT_TIMEOUT`：ExtendScript のデフォルトタイムアウト（ミリ秒、既定 `30000`、最大 `600000`）
 - `LOG_LEVEL`：ログレベル（0=DEBUG、1=INFO、2=WARN、3=ERROR）
 - `ANALYTICS_DISABLED`：`1`または`true`に設定して匿名使用状況の解析を完全に無効化
 - `POSTHOG_DISABLED`：`ANALYTICS_DISABLED`の旧エイリアス

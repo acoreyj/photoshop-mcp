@@ -683,6 +683,7 @@ const q = query({
 ### Ortam Değişkenleri
 
 - `PHOTOSHOP_PATH`: (İsteğe bağlı) Özel Photoshop kurulum yolunu belirtin
+- `PHOTOSHOP_SCRIPT_TIMEOUT`: Varsayılan ExtendScript zaman aşımı (ms; varsayılan `30000`, en fazla `600000`)
 - `LOG_LEVEL`: Günlük kaydı düzeyi (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR)
 - `ANALYTICS_DISABLED`: Anonim kullanım analizlerini tamamen devre dışı bırakmak için `1` veya `true`
   olarak ayarlayın

@@ -282,13 +282,14 @@ export function toolException(error: unknown, code = 'recipe_exception'): ToolRe
 export async function executeRecipe(
   connection: PhotoshopConnection,
   historyName: string,
-  body: string
+  body: string,
+  timeoutMs?: number
 ): Promise<ToolResult> {
   try {
     const apiFactory = new PhotoshopAPIFactory(connection);
     const api = await apiFactory.createAPI();
     const script = wrapInSuspendHistory(historyName, body);
-    const raw = await api.executeScript(script);
+    const raw = await api.executeScript(script, timeoutMs);
     const parsed = parseRecipeResult(raw);
     if (!parsed) {
       return toolFailure({
@@ -306,13 +307,14 @@ export async function executeRecipe(
 /** Like executeRecipe but without suspendHistory or an active-document requirement. */
 export async function executeStandaloneRecipe(
   connection: PhotoshopConnection,
-  body: string
+  body: string,
+  timeoutMs?: number
 ): Promise<ToolResult> {
   try {
     const apiFactory = new PhotoshopAPIFactory(connection);
     const api = await apiFactory.createAPI();
     const script = wrapInStandaloneScript(body);
-    const raw = await api.executeScript(script);
+    const raw = await api.executeScript(script, timeoutMs);
     const parsed = parseRecipeResult(raw);
     if (!parsed) {
       return toolFailure({
@@ -333,6 +335,7 @@ export function clampInt(value: unknown, min: number, max: number, fallback: num
 }
 
 export { jsString } from '../../utils/js-string.js';
+export { BATCH_SCRIPT_TIMEOUT_MS } from '../../platform/script-timeout.js';
 
 export function gradientMaskAxisPercents(
   direction: GradientMaskDirection,

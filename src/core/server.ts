@@ -44,6 +44,7 @@ import { createColorAdjustmentTools } from '../tools/color-adjustment-tools.js';
 import { createDataTools } from '../tools/data-tools.js';
 import { createStackTools } from '../tools/stack-tools.js';
 import { createExportTools } from '../tools/export-tools.js';
+import { createArtboardTools } from '../tools/artboard-tools.js';
 import { ensureUxpBridgeServer } from '../platform/uxp-bridge-server.js';
 import { buildPingToolResult, submitFeedbackFromArgs } from '../feedback/nudge.js';
 
@@ -182,6 +183,7 @@ export class PhotoshopMCPServer {
     this.registerToolDefinitions(createDataTools(connection));
     this.registerToolDefinitions(createStackTools(connection));
     this.registerToolDefinitions(createExportTools(connection));
+    this.registerToolDefinitions(createArtboardTools(connection));
     this.registerToolDefinitions(createRecipeTools(connection));
 
     this.logger.info(
