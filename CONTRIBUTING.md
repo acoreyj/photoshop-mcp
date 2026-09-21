@@ -82,15 +82,27 @@ and refreshes release notes once npm is live.
 
 5. Wait for the [Release workflow](.github/workflows/release.yml) to finish, then
    verify the new release on the repo **Releases** page. The workflow publishes to
-   npm and the MCP Registry, then refreshes release notes with **✅ Published on
-   npm.** Each release includes install commands, npm registry link,
-   [CHANGELOG.md](CHANGELOG.md) anchor, categorized commits, PR links (when `#123`
-   appears in messages), and **New Contributors** when applicable (see
-   [`scripts/build-release-notes.sh`](scripts/build-release-notes.sh)).
+   npm, waits for the version to become installable (npm publish-time malware scan
+   can take ~5–15 minutes), refreshes release notes with **✅ Published on npm.**,
+   then publishes metadata to the MCP Registry. Each release includes install
+   commands, npm registry link, [CHANGELOG.md](CHANGELOG.md) anchor, categorized
+   commits, PR links (when `#123` appears in messages), and **New Contributors**
+   when applicable (see [`scripts/build-release-notes.sh`](scripts/build-release-notes.sh)).
 
-   If publish failed but the GitHub Release exists, fix the issue and re-run the
-   failed **publish** job from Actions, or run [Refresh Release Notes](.github/workflows/refresh-release-notes.yml)
-   after a manual `npm publish` + `./mcp-publisher publish`.
+   **npm scan delay:** `npm publish` can succeed before the version is visible on
+   the registry. The publish job polls with
+   [`scripts/wait-for-npm-version.sh`](scripts/wait-for-npm-version.sh) (up to ~20
+   minutes) before MCP Registry publish and release-note refresh.
+
+   If publish failed but the GitHub Release exists:
+
+   - Re-run the failed **publish** job from Actions (safe when the version is
+     already on npm).
+   - Or run [Refresh Release Notes](.github/workflows/refresh-release-notes.yml)
+     and [Publish MCP Registry](.github/workflows/publish-mcp-registry.yml) with
+     the tag after a manual `npm publish`.
+   - If npm never shows the version, check npm account notifications for a blocked
+     or held package before bumping the version again.
 
 Always tag the **release commit on `master`**, not a feature branch. Re-pushing an
 existing tag is safe — the workflow updates the GitHub Release for that tag.

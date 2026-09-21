@@ -30,4 +30,5 @@ jobs:
         env:
           TAG: ${{ inputs.tag }}
           GH_TOKEN: ${{ github.token }}
+          NPM_WAIT_FOR_VERSION: "1"
         run: bash scripts/refresh-release-notes.sh "$TAG"
