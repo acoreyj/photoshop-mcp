@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.20] - 2026-09-22
+
+[v1.7.19...v1.7.20](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.19...v1.7.20)
+
+Shaped by anonymous product feedback.
+
+### Fixed
+
+- Generative remove calls Firefly `syntheticFill` instead of empty `removeTool` / `generativeFill` descriptors. Those descriptors make Photoshop return Error 8 Syntax error.
+- Selection expand, contract, and feather use Action Manager when the DOM command is unavailable. `photoshop_select_rectangle` accepts `mode` (`replace`, `add`, `subtract`, `intersect`).
+- Generate Image uses the same Firefly `syntheticFill` path. The tool description names it as Photoshop Generate Image / ImageGen.
+- Photoshop Error 8 / "Syntax error" is classified as `extendscript_runtime_error` instead of `unknown`.
+
 ## [1.7.19] - 2026-09-21
 
 [v1.7.18...v1.7.19](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.18...v1.7.19)
