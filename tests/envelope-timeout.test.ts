@@ -18,6 +18,7 @@ describe('classifyError timeouts and artboards', () => {
 
   it('still classifies generative timeouts specifically', () => {
     expect(classifyError('generative fill timed out').code).toBe('generative_timeout');
+    expect(classifyError('Error 8: Syntax error').code).toBe('extendscript_runtime_error');
   });
 
   it('classifies missing artboards', () => {

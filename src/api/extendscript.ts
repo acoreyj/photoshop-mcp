@@ -3569,6 +3569,58 @@ export const ExtendScriptSnippets = {
     function __mcp_hasSelection(doc) {
       try { return doc.selection.bounds != null; } catch (e) { return false; }
     }
+
+    function __mcp_historyIndex(doc) {
+      try {
+        if (doc.activeHistoryState && doc.activeHistoryState.index != null) {
+          return doc.activeHistoryState.index;
+        }
+      } catch (eHist) {}
+      try { return doc.historyStates.length; } catch (eLen) {}
+      return 0;
+    }
+
+    /**
+     * Firefly inpainting. Empty descriptors on removeTool/generativeFill raise
+     * Photoshop Error 8 ("Syntax error"). The recorded event is syntheticFill.
+     * @see https://community.adobe.com/feature-requests-713/please-please-create-a-larger-generative-ai-prompt-field-1615149
+     */
+    function __mcp_syntheticFill(doc, prompt, workflow) {
+      try {
+        var bg = doc.backgroundLayer;
+        if (bg) bg.isBackgroundLayer = false;
+      } catch (eBg) {}
+      var text = prompt || '';
+      var flow = workflow || 'in_painting';
+      var last = '';
+      var withOptions = [false, true];
+      for (var i = 0; i < withOptions.length; i++) {
+        try {
+          var desc = new ActionDescriptor();
+          var ref = new ActionReference();
+          ref.putEnumerated(sTID('document'), sTID('ordinal'), sTID('targetEnum'));
+          desc.putReference(sTID('null'), ref);
+          try { desc.putInteger(sTID('documentID'), doc.id); } catch (eDoc) {}
+          try { desc.putInteger(sTID('layerID'), doc.activeLayer.id); } catch (eLayer) {}
+          desc.putString(sTID('prompt'), text);
+          desc.putString(sTID('serviceID'), 'clio');
+          desc.putEnumerated(sTID('workflowType'), sTID('genWorkflow'), sTID(flow));
+          if (withOptions[i]) {
+            var clio = new ActionDescriptor();
+            clio.putString(sTID('gi_PROMPT'), text);
+            clio.putString(sTID('gi_MODE'), flow === 'text_to_image' ? 't2i' : 'ginp');
+            var opts = new ActionDescriptor();
+            opts.putObject(sTID('clio'), sTID('clio'), clio);
+            desc.putObject(sTID('serviceOptionsList'), sTID('null'), opts);
+          }
+          executeAction(sTID('syntheticFill'), desc, DialogModes.NO);
+          return withOptions[i] ? 'syntheticFill_clio' : 'syntheticFill';
+        } catch (eFill) {
+          last = eFill.message || String(eFill);
+        }
+      }
+      throw new Error(last || 'syntheticFill failed');
+    }
   `,
 
   generativeFill: (prompt: string) => {
@@ -3637,23 +3689,19 @@ export const ExtendScriptSnippets = {
     }
 
     if (${featherPx} > 0) {
-      try { doc.selection.feather(${featherPx}); } catch (eF) {}
+      try { doc.selection.feather(new UnitValue(${featherPx}, 'px')); } catch (eF) {}
     }
 
-    var baselineHist = doc.activeHistoryState.index;
-    var result = __mcp_tryGenerativeAction(
-      ['removeTool', 'generativeFill', 'spotHealingBrush'],
-      function(actionId) {
-        var desc = new ActionDescriptor();
-        if (actionId === 'generativeFill') {
-          try { desc.putString(sTID('prompt'), 'remove'); } catch (eP) {}
-        }
-        return desc;
-      }
-    );
-
-    if (!result.ok) {
-      return { ok: false, code: 'generative_unavailable', message: String(result.error || '') };
+    var baselineHist = __mcp_historyIndex(doc);
+    var actionId = '';
+    try {
+      actionId = __mcp_syntheticFill(doc, 'remove the selected object');
+    } catch (eGen) {
+      var msg = String(eGen.message || eGen);
+      var code = /credit|quota|sign in|subscription/i.test(msg)
+        ? 'generative_credits_exhausted'
+        : 'generative_unavailable';
+      return { ok: false, code: code, message: msg };
     }
 
     var wait = __mcp_waitGenerativeComplete(doc, baselineHist, 90000);
@@ -3661,8 +3709,8 @@ export const ExtendScriptSnippets = {
 
     return {
       ok: true,
-      summary: 'Generative remove invoked via ' + result.action_id,
-      details: { action_id: result.action_id, feather_px: ${featherPx}, wait },
+      summary: 'Generative remove invoked via ' + actionId,
+      details: { action_id: actionId, feather_px: ${featherPx}, wait },
       next_suggested_tool: 'photoshop_get_preview'
     };
   `,
