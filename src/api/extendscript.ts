@@ -297,6 +297,43 @@ function __mcp_requireSelection() {
   return null;
 }
 
+function __mcp_modifySelection(charId, pixels) {
+  var desc = new ActionDescriptor();
+  var key = charId === 'Fthr' ? 'Rds ' : 'By  ';
+  desc.putUnitDouble(cTID(key), cTID('#Pxl'), pixels);
+  executeAction(cTID(charId), desc, DialogModes.NO);
+}
+
+function __mcp_selectRect(left, top, right, bottom, mode) {
+  var modifier = mode || 'replace';
+  if (modifier === 'replace') {
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    ref.putProperty(cTID('Chnl'), cTID('fsel'));
+    desc.putReference(cTID('null'), ref);
+    var rect = new ActionDescriptor();
+    rect.putUnitDouble(cTID('Top '), cTID('#Pxl'), top);
+    rect.putUnitDouble(cTID('Left'), cTID('#Pxl'), left);
+    rect.putUnitDouble(cTID('Btom'), cTID('#Pxl'), bottom);
+    rect.putUnitDouble(cTID('Rght'), cTID('#Pxl'), right);
+    desc.putObject(cTID('T   '), cTID('Rctn'), rect);
+    desc.putBoolean(cTID('AntA'), true);
+    executeAction(cTID('setd'), desc, DialogModes.NO);
+    return;
+  }
+
+  var typeName = modifier === 'add' ? 'EXTEND' : (modifier === 'subtract' ? 'DIMINISH' : 'INTERSECT');
+  var selType = null;
+  try {
+    if (typeof SelectionType !== 'undefined') selType = SelectionType[typeName];
+  } catch (eEnum) {}
+  if (!selType) {
+    throw new Error('SelectionType.' + typeName + ' is not available');
+  }
+  var pts = [[left, top], [right, top], [right, bottom], [left, bottom]];
+  app.activeDocument.selection.select(pts, selType, 0, true);
+}
+
 function __mcp_readSelectionBounds(doc) {
   try {
     var b = doc.selection.bounds;
@@ -2561,7 +2598,11 @@ export const ExtendScriptSnippets = {
     var selErr = __mcp_requireSelection();
     if (selErr) return selErr;
 
-    doc.selection.expand(new UnitValue(${pixels}, 'px'));
+    try {
+      __mcp_modifySelection('Expn', ${pixels});
+    } catch (eExp) {
+      doc.selection.expand(new UnitValue(${pixels}, 'px'));
+    }
 
     var result = {
       ok: true,
@@ -2592,7 +2633,11 @@ export const ExtendScriptSnippets = {
     var selErr = __mcp_requireSelection();
     if (selErr) return selErr;
 
-    doc.selection.contract(new UnitValue(${pixels}, 'px'));
+    try {
+      __mcp_modifySelection('Cntc', ${pixels});
+    } catch (eCnt) {
+      doc.selection.contract(new UnitValue(${pixels}, 'px'));
+    }
 
     var result = {
       ok: true,
@@ -2623,7 +2668,11 @@ export const ExtendScriptSnippets = {
     var selErr = __mcp_requireSelection();
     if (selErr) return selErr;
 
-    doc.selection.feather(new UnitValue(${pixels}, 'px'));
+    try {
+      __mcp_modifySelection('Fthr', ${pixels});
+    } catch (eFth) {
+      doc.selection.feather(new UnitValue(${pixels}, 'px'));
+    }
 
     var result = {
       ok: true,
@@ -2661,7 +2710,13 @@ export const ExtendScriptSnippets = {
     var chan = doc.channels.add();
     chan.name = name;
     chan.kind = ChannelType.SELECTEDAREA;
-    doc.selection.store(chan, SelectionType.REPLACE);
+    try {
+      doc.selection.store(chan);
+    } catch (eStore) {
+      var replaceMode = 1;
+      try { replaceMode = SelectionType.REPLACE; } catch (eEnum) {}
+      doc.selection.store(chan, replaceMode);
+    }
 
     return {
       ok: true,
@@ -2674,19 +2729,30 @@ export const ExtendScriptSnippets = {
   /**
    * Create rectangular selection
    */
-  selectRectangle: (left: number, top: number, right: number, bottom: number) => `
+  selectRectangle: (
+    left: number,
+    top: number,
+    right: number,
+    bottom: number,
+    mode: 'replace' | 'add' | 'subtract' | 'intersect' = 'replace'
+  ) => `
+    ${helperFunctions}
+    ${selectionHelpers}
+
     if (app.documents.length === 0) {
       throw new Error('No active document');
     }
     var doc = app.activeDocument;
-    
-    var bounds = [[${left}, ${top}], [${right}, ${top}], [${right}, ${bottom}], [${left}, ${bottom}]];
-    doc.selection.select(bounds);
-    
-    return { 
+    __mcp_selectRect(${left}, ${top}, ${right}, ${bottom}, '${mode}');
+
+    var result = {
       selection: 'rectangle',
+      mode: '${mode}',
       bounds: [${left}, ${top}, ${right}, ${bottom}]
     };
+    var boundsRead = __mcp_readSelectionBounds(doc);
+    if (boundsRead) result.selection_bounds = boundsRead;
+    return result;
   `,
 
   /**
