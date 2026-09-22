@@ -3911,27 +3911,29 @@ export const ExtendScriptSnippets = {
         doc = app.activeDocument;
       }
 
-      var baselineHist = doc.activeHistoryState.index;
-      var result = __mcp_tryGenerativeAction(
-        ['textToImage', 'generateImage', 'fireflyTextToImage', 'generativeFill'],
-        function(actionId) {
-          var desc = new ActionDescriptor();
-          try { desc.putString(sTID('prompt'), ${escaped}); } catch (eP) {}
-          try { desc.putString(sTID('text'), ${escaped}); } catch (eT) {}
-          return desc;
+      var baselineHist = __mcp_historyIndex(doc);
+      var actionId = '';
+      try {
+        actionId = __mcp_syntheticFill(doc, ${escaped}, 'text_to_image');
+      } catch (eT2i) {
+        try {
+          doc.selection.selectAll();
+          actionId = __mcp_syntheticFill(doc, ${escaped}, 'in_painting');
+        } catch (eGen) {
+          var msg = String(eGen.message || eGen);
+          var code = /credit|quota|sign in|subscription/i.test(msg)
+            ? 'generative_credits_exhausted'
+            : 'generative_unavailable';
+          return { ok: false, code: code, message: msg };
         }
-      );
-
-      if (!result.ok) {
-        return { ok: false, code: 'generative_unavailable', message: String(result.error || '') };
       }
 
       var wait = __mcp_waitGenerativeComplete(doc, baselineHist, 120000);
 
       return {
         ok: true,
-        summary: 'Generate image invoked via ' + result.action_id,
-        details: { action_id: result.action_id, prompt: ${escaped}, width: ${width}, height: ${height}, wait },
+        summary: 'Generate image invoked via ' + actionId,
+        details: { action_id: actionId, prompt: ${escaped}, width: ${width}, height: ${height}, wait },
         next_suggested_tool: 'photoshop_get_preview'
       };
     `;
