@@ -23,6 +23,7 @@ vi.mock('../src/platform/detector.js', () => ({
 
 import { MacOSExecutor } from '../src/platform/macos-executor.js';
 import { PhotoshopConnection } from '../src/platform/connection.js';
+import { PhotoshopAPIFactory } from '../src/api/photoshop-api.js';
 
 const appNameOf = (executor: MacOSExecutor) =>
   (executor as unknown as { appName: string }).appName;
@@ -70,5 +71,19 @@ describe('PhotoshopConnection on macOS', () => {
     const connection = new PhotoshopConnection();
     await connection.ensurePhotoshopRunning();
     expect(seenAppNames).toEqual(['Adobe Photoshop 2026']);
+  });
+
+  it('createAPI detects Photoshop on first use when info is not resolved yet', async () => {
+    // Regression: createAPI() read getPhotoshopInfo() synchronously and threw
+    // before executeScript() could run detection, so the first get_state of a
+    // session failed with "Photoshop info not available" and the Action Plan
+    // repair loop retried the same step until it gave up.
+    const connection = new PhotoshopConnection();
+    expect(connection.getPhotoshopInfo()).toBeNull();
+
+    const api = await new PhotoshopAPIFactory(connection).createAPI();
+
+    expect(api.getAPIType()).toBe('ExtendScript');
+    expect(connection.getPhotoshopInfo()?.path).toContain('Adobe Photoshop 2026');
   });
 });

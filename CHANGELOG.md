@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Standalone UI: OpenCode Zen and OpenCode Go providers (API key). OpenCode Zen exposes Claude, GPT, Gemini, Grok, Qwen, DeepSeek, GLM, Kimi, and MiniMax models; OpenCode Go adds the open coding models on the $10/month subscription. Each model is routed over the wire format OpenCode publishes — chat completions, Anthropic messages, OpenAI responses, or Google Generative Language.
+
+### Fixed
+
+- MCP server: the first tool call of a fresh process now detects Photoshop before creating the ExtendScript API, so `photoshop_get_state` and other tools no longer fail with "Photoshop info not available. Please detect Photoshop first." — previously surfaced in the standalone UI as "Action plan failed after 3 repair attempts". Detection failures now return a `photoshop_unreachable` envelope that suggests `photoshop_ping`.
+- Standalone UI: the provider/model picked inside a chat is remembered as the default for new chats and persists across reloads. Previously new chats always used whatever was saved during onboarding or in Settings.
+
 ## [1.7.20] - 2026-09-22
 
 [v1.7.19...v1.7.20](https://github.com/alisaitteke/photoshop-mcp/compare/v1.7.19...v1.7.20)

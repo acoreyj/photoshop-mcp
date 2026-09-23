@@ -94,9 +94,13 @@ function handleBetaAnswered(): void {
 
 async function handleNewChat(): Promise<void> {
   if (!status.value) return;
+  // New chats remember the last selection: the open chat, else the most
+  // recently updated one, else the saved default from onboarding/settings.
+  const lastUsed =
+    chat.chats.value.find((c) => c.id === chat.activeChatId.value) ?? chat.chats.value[0];
   const created = await chat.newChat({
-    provider: status.value.activeProvider,
-    model: status.value.activeModel,
+    provider: lastUsed?.provider ?? status.value.activeProvider,
+    model: lastUsed?.model ?? status.value.activeModel,
   });
   await router.push({ name: 'chat', params: { id: created.id } });
 }

@@ -2,6 +2,7 @@ import { anthropicAdapter } from './anthropic.js';
 import { customAdapter } from './custom.js';
 import { googleAdapter } from './google.js';
 import { openaiAdapter } from './openai.js';
+import { opencodeAdapter, opencodeGoAdapter } from './opencode.js';
 import { openrouterAdapter } from './openrouter.js';
 import type { ProviderAdapter, ProviderId } from './types.js';
 
@@ -9,6 +10,8 @@ export const providers: Record<ProviderId, ProviderAdapter> = {
   anthropic: anthropicAdapter,
   openai: openaiAdapter,
   openrouter: openrouterAdapter,
+  opencode: opencodeAdapter,
+  'opencode-go': opencodeGoAdapter,
   google: googleAdapter,
   custom: customAdapter,
 };

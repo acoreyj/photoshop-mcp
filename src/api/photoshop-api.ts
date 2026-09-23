@@ -26,8 +26,19 @@ export class PhotoshopAPIFactory {
   }
 
   async createAPI(): Promise<PhotoshopAPI> {
-    const info = this.connection.getPhotoshopInfo();
-    
+    let info = this.connection.getPhotoshopInfo();
+
+    // getPhotoshopInfo() only reflects an already-resolved detect. On the first
+    // tool call of a fresh process (empty detect cache) it is null, and callers
+    // such as photoshop_get_state invoke createAPI() before executeScript() —
+    // the method that would otherwise trigger detection. Resolve here so the
+    // first call self-heals instead of failing with "Photoshop info not
+    // available" and trapping the Action Plan repair loop on the same step.
+    if (!info) {
+      await this.connection.ensureDetected();
+      info = this.connection.getPhotoshopInfo();
+    }
+
     if (!info) {
       throw new Error('Photoshop info not available. Please detect Photoshop first.');
     }

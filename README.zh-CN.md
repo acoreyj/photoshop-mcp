@@ -53,6 +53,8 @@ npx -p @alisaitteke/photoshop-mcp photoshop-mcp-ui
 | **OpenAI** | GPT-5, GPT-4.1, o-series | [platform.openai.com](https://platform.openai.com/api-keys) | — |
 | **Google** | Gemini 2.5 Pro / Flash / Flash-Lite | [aistudio.google.com](https://aistudio.google.com/apikey) | `npm i -g @google/gemini-cli` → `gemini auth login` |
 | **OpenRouter** | 100+ 来自任意提供商的模型 | [openrouter.ai](https://openrouter.ai/keys) | — |
+| **OpenCode Zen** | Claude、GPT、Gemini、Grok、Qwen、DeepSeek、GLM、Kimi、MiniMax | [opencode.ai/auth](https://opencode.ai/auth) | — |
+| **OpenCode Go** | 订阅制（每月 10 美元）开源编码模型 | [opencode.ai/auth](https://opencode.ai/auth) | — |
 
 ### 认证模式
 

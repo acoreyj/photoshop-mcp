@@ -71,6 +71,7 @@ export async function* runChatViaActionPlan(
       provider: opts.provider,
       apiKey: opts.apiKey,
       modelId: opts.modelId,
+      chatId: opts.chatId,
       cliPath: opts.cliPath,
     });
   } catch (err) {

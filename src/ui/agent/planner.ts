@@ -46,6 +46,7 @@ export interface CreatePlannerOptions {
   provider: ProviderAdapter;
   apiKey?: string;
   modelId: string;
+  chatId?: string;
   cliPath?: string;
 }
 
@@ -67,5 +68,6 @@ export function createPlanner(opts: CreatePlannerOptions): Planner {
     provider: opts.provider,
     apiKey: opts.apiKey,
     modelId: opts.modelId,
+    sessionId: opts.chatId,
   });
 }

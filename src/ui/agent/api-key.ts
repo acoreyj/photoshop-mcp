@@ -50,6 +50,7 @@ export async function* runChatViaApiKey(
       model: opts.provider.getLanguageModel({
         apiKey: opts.apiKey,
         modelId: opts.modelId,
+        sessionId: opts.chatId,
       }),
       tools,
       system: opts.systemPrompt,

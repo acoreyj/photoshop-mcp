@@ -48,7 +48,14 @@ export async function api<T = unknown>(path: string, init: RequestInit = {}): Pr
   return (await res.json()) as T;
 }
 
-export type ProviderId = 'anthropic' | 'openai' | 'openrouter' | 'google' | 'custom';
+export type ProviderId =
+  | 'anthropic'
+  | 'openai'
+  | 'openrouter'
+  | 'opencode'
+  | 'opencode-go'
+  | 'google'
+  | 'custom';
 export type AuthMethod = 'api_key' | 'cli_account';
 
 export interface Status {

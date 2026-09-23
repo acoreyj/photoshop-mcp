@@ -37,6 +37,20 @@ describe('classifyError timeouts and artboards', () => {
     expect(envelope.suggested_next_tool).toBe('photoshop_create_text_layer');
   });
 
+  it('classifies an unavailable Photoshop detection and points at ping', () => {
+    const envelope = classifyError(
+      'Photoshop info not available. Please detect Photoshop first.'
+    );
+    expect(envelope.code).toBe('photoshop_unreachable');
+    expect(envelope.suggested_next_tool).toBe('photoshop_ping');
+  });
+
+  it('classifies a failed install detect the same way', () => {
+    expect(classifyError('Photoshop not found on this system').code).toBe(
+      'photoshop_unreachable'
+    );
+  });
+
   it('after a generic tool timeout, points the agent at ping instead of another 30s script', () => {
     const refined = refineTimeoutEnvelope(
       'photoshop_get_state',

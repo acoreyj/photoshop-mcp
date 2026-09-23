@@ -38,6 +38,7 @@ import {
   type ProviderId,
 } from './config.js';
 import { getProvider, listProviders } from './providers/registry.js';
+import { resolveChatModelSelection } from './chat-selection.js';
 import {
   createSessionToken,
   extractRequestToken,
@@ -448,11 +449,16 @@ export async function startUIServer(opts: UIServerOptions): Promise<UIServer> {
     if (body.provider !== undefined || body.model !== undefined) {
       const chat = getChat(id);
       if (!chat) return c.json({ error: 'not_found' }, 404);
-      const provider = body.provider ?? (chat.provider as ProviderId);
-      const adapter = getProvider(provider);
-      if (!adapter) return c.json({ error: 'unknown_provider' }, 400);
-      const model = body.model ?? (body.provider ? adapter.defaultModel() : chat.model);
+      const resolved = resolveChatModelSelection(
+        { provider: chat.provider as ProviderId, model: chat.model },
+        body,
+        (providerId) => getProvider(providerId)
+      );
+      if (!resolved.ok) return c.json({ error: resolved.error }, 400);
+      const { provider, model } = resolved.selection;
       updateChatModel(id, provider, model);
+      // Remember the last selection as the default for new chats.
+      saveConfig({ activeProvider: provider, activeModel: model });
       identifyUiModelSelection(provider, model);
     }
     return c.json({ ok: true });

@@ -1,6 +1,7 @@
 import type { LanguageModel } from 'ai';
 
-export type ProviderId = 'anthropic' | 'openai' | 'openrouter' | 'google' | 'custom';
+export type ProviderId =
+  'anthropic' | 'openai' | 'openrouter' | 'opencode' | 'opencode-go' | 'google' | 'custom';
 
 export type AuthMethod = 'api_key' | 'cli_account';
 
@@ -64,6 +65,6 @@ export interface ProviderAdapter {
   validateCliAccount?(opts: { cliPath?: string }): Promise<CliAccountValidation>;
   listModels(): ProviderModel[];
   defaultModel(): string;
-  getLanguageModel(opts: { apiKey: string; modelId: string }): LanguageModel;
+  getLanguageModel(opts: { apiKey: string; modelId: string; sessionId?: string }): LanguageModel;
   getModelPricing(modelId: string): ModelPricing | undefined;
 }

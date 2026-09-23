@@ -15,6 +15,7 @@ export interface SdkStructuredPlannerOptions {
   provider: ProviderAdapter;
   apiKey: string;
   modelId: string;
+  sessionId?: string;
 }
 
 export class SdkStructuredPlanner implements Planner {
@@ -52,6 +53,7 @@ export class SdkStructuredPlanner implements Planner {
     const model = this.opts.provider.getLanguageModel({
       apiKey: this.opts.apiKey,
       modelId: this.opts.modelId,
+      sessionId: this.opts.sessionId,
     });
     const streamed = streamText({
       model,

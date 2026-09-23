@@ -25,6 +25,12 @@ CLI subscription account (Anthropic and Google):
 | **OpenAI** | GPT-5, GPT-4.1, o-series | [platform.openai.com](https://platform.openai.com/api-keys) | — |
 | **Google** | Gemini 2.5 Pro / Flash / Flash-Lite | [aistudio.google.com](https://aistudio.google.com/apikey) | `npm i -g @google/gemini-cli` → `gemini auth login` |
 | **OpenRouter** | 100+ models from any provider | [openrouter.ai](https://openrouter.ai/keys) | — |
+| **OpenCode Zen** | Claude, GPT, Gemini, Grok, Qwen, DeepSeek, GLM, Kimi, MiniMax | [opencode.ai/auth](https://opencode.ai/auth) | — |
+| **OpenCode Go** | Open coding models on a $10/month subscription | [opencode.ai/auth](https://opencode.ai/auth) | — |
+
+The provider and model you pick inside a chat become the default for new chats
+and are stored locally, so the choice is remembered across reloads. Each
+existing chat keeps its own model.
 
 ## Authentication modes
 

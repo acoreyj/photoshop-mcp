@@ -4,6 +4,7 @@ import { Globe } from 'lucide-vue-next';
 import anthropicIcon from '@lobehub/icons-static-svg/icons/anthropic.svg?url';
 import openaiIcon from '@lobehub/icons-static-svg/icons/openai.svg?url';
 import openrouterIcon from '@lobehub/icons-static-svg/icons/openrouter.svg?url';
+import opencodeIcon from '@lobehub/icons-static-svg/icons/opencode.svg?url';
 import geminiIcon from '@lobehub/icons-static-svg/icons/gemini-color.svg?url';
 import type { ProviderId } from '@/lib/api';
 
@@ -11,6 +12,8 @@ const ICONS: Partial<Record<ProviderId, string>> = {
   anthropic: anthropicIcon,
   openai: openaiIcon,
   openrouter: openrouterIcon,
+  opencode: opencodeIcon,
+  'opencode-go': opencodeIcon,
   google: geminiIcon,
 };
 
@@ -18,6 +21,8 @@ const LABELS: Record<ProviderId, string> = {
   anthropic: 'Anthropic',
   openai: 'OpenAI',
   openrouter: 'OpenRouter',
+  opencode: 'OpenCode Zen',
+  'opencode-go': 'OpenCode Go',
   google: 'Google',
   custom: 'Custom',
 };
@@ -28,6 +33,8 @@ const MONO: Partial<Record<ProviderId, boolean>> = {
   anthropic: true,
   openai: true,
   openrouter: true,
+  opencode: true,
+  'opencode-go': true,
   google: false,
 };
 

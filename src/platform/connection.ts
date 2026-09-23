@@ -157,6 +157,16 @@ export class PhotoshopConnection {
     return this.photoshopInfo;
   }
 
+  /**
+   * Run a real detect (or hydrate from the on-disk cache) and return the
+   * resolved info. Unlike ping(), a detector failure propagates so callers can
+   * surface the actionable cause (e.g. "Photoshop not found on this system")
+   * instead of a generic "info not available" message.
+   */
+  async ensureDetected(): Promise<PhotoshopInfo | null> {
+    return this.resolvePhotoshopInfo();
+  }
+
   async ensurePhotoshopRunning(): Promise<void> {
     await this.resolvePhotoshopInfo();
     if (!this.photoshopInfo) {

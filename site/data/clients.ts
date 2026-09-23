@@ -179,7 +179,7 @@ export const CLIENTS: ClientDef[] = [
     cli: UI_COMMAND,
     steps: [
       'Runs a local chat at 127.0.0.1 and opens your browser.',
-      'Sign in with an API key (Anthropic, OpenAI, Google, OpenRouter) or reuse your Claude Code account.',
+      'Sign in with an API key (Anthropic, OpenAI, Google, OpenRouter, OpenCode Zen/Go) or reuse your Claude Code account.',
     ],
     docs: '/docs/web-ui',
     platforms: ['mac', 'windows'],

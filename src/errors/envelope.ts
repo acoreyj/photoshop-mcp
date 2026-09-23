@@ -26,6 +26,7 @@ export type PhotoshopErrorCode =
   | 'unsupported_color_mode'
   | 'no_base_layer_below'
   | 'not_clipping'
+  | 'photoshop_unreachable'
   | 'unknown';
 
 export interface PhotoshopErrorEnvelope {
@@ -41,6 +42,11 @@ const ERROR_PATTERNS: Array<{
   code: PhotoshopErrorCode;
   suggested_next_tool?: string;
 }> = [
+  {
+    pattern: /photoshop info not available|photoshop not found|not found on this system|unsupported platform/i,
+    code: 'photoshop_unreachable',
+    suggested_next_tool: 'photoshop_ping',
+  },
   { pattern: /document_not_found/i, code: 'document_not_found', suggested_next_tool: 'photoshop_list_documents' },
   { pattern: /no active document/i, code: 'no_active_document', suggested_next_tool: 'photoshop_get_state' },
   { pattern: /no documents/i, code: 'no_active_document', suggested_next_tool: 'photoshop_get_state' },
